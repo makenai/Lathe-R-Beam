@@ -1,0 +1,62 @@
+<html>
+	<head>
+		<title>Lathe</title>
+		<style>
+			canvas { background-color: #ddd; }
+			body { margin: 0; padding: 0; }
+		</style>
+	</head>
+	<body>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<script src="https://rawgithub.com/mrdoob/three.js/master/build/three.js"></script>
+		<script>
+			var canvasWidth = 800,
+				canvasHeight = 800,
+				magicNumber = 208;
+			var scene = new THREE.Scene();
+			var camera = new THREE.PerspectiveCamera(45, canvasWidth / canvasHeight, 1, 1000);
+			camera.position.z = 500;
+
+			var renderer = new THREE.WebGLRenderer();
+			renderer.setSize( canvasWidth, canvasHeight );
+			document.body.appendChild( renderer.domElement );
+
+
+			function addPoint( x, y ) {
+				var sphere = new THREE.Mesh(
+					new THREE.SphereGeometry(5, 10, 10), 
+					new THREE.MeshNormalMaterial()
+				);
+				sphere.overdraw = true;
+				sphere.position.x = x;
+				sphere.position.y = y;
+				scene.add( sphere );
+				renderer.render(scene, camera);
+			}
+
+
+			jQuery(document).ready(function($) {
+
+				// Center Dots
+				addPoint( 0, 0 );
+
+				$('body').on('click', 'canvas', function(e) {
+
+					var xPos = ( e.clientX - ( canvasWidth / 2  ) ) * ( magicNumber * 2 / canvasWidth ),
+						yPos = ( ( canvasHeight / 2 ) - e.clientY ) * ( magicNumber * 2 / canvasWidth );
+
+					addPoint( xPos, yPos );
+
+
+
+
+
+					renderer.render(scene, camera);
+
+				});
+
+			});
+
+		</script>
+	</body>
+</html>
