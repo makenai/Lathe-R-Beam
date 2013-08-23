@@ -46,18 +46,7 @@
 			document.getElementById('canvasContainer').appendChild( renderer.domElement ).setAttribute( 'id', 'editWindow' );
 			
 			drawLine( 0, magicNumber, 0, -magicNumber );
-			addPoint(1.56, 172.12); 
-			addPoint(19.76, 171.08); 
-			addPoint(22.36, 148.72); 
-			addPoint(11.440000000000001, 134.68); 
-			addPoint(10.4, 104); 
-			addPoint(10.4, 82.16); 
-			addPoint(42.64, 68.64); 
-			addPoint(62.400000000000006, 57.2); 
-			addPoint(59.800000000000004, 43.68); 
-			addPoint(36.4, 43.68); 
-			addPoint(13, 43.68); 
-			addPoint(1.04, 43.68); 
+
 			renderer.render(scene, camera);
 
 			// Set up preview window
@@ -83,7 +72,6 @@
 				var line = new THREE.Line( path, lineMaterial );
 				scene.add( line );
 				renderer.render(scene, camera);
-
 			}
 
 
@@ -121,16 +109,18 @@
 						previewScene.remove( previewMesh );
 					}
 
-					previewMesh = new THREE.Mesh( new THREE.LatheGeometry( path.vertices, 12 ), 
-						new THREE.MeshLambertMaterial( { color: 0x2D303D, wireframe: true, shading: THREE.FlatShading } ));
+					previewMesh = new THREE.Mesh( new THREE.LatheGeometry( path.vertices, 12, 10000000 ), 
+						new THREE.MeshLambertMaterial( { color: 0x2D303D, wireframe: false, shading: THREE.FlatShading } ));
 
 					previewScene.add( previewMesh );
 					previewMesh.rotation.x = 300;
+					console.log(previewMesh);
 					// previewMesh.rotation.y = 600;
 					previewWindow.render( previewScene, previewCamera);
+					generateSTL(previewMesh.geometry);
 
 				});
-				$('#lathe').click();
+				//$('#lathe').click();
 
 				$('#editWindow').on('click', function(e) {
 
@@ -166,6 +156,7 @@
 					scene.add( line );
 					
 					renderer.render(scene, camera);
+
 
 				});
 
@@ -216,6 +207,33 @@
 
 			        }
 			    });
+
+			    function stringifyVector(vec){
+				  return ""+vec.x+" "+vec.y+" "+vec.z;
+				}
+
+				function stringifyVertex(vec){
+				  return "vertex "+stringifyVector(vec)+" \n";
+				}
+
+				function generateSTL(geometry) {
+				  var vertices = geometry.vertices;
+				  var tris     = geometry.faces;
+
+				  stl = "solid pixel";
+				  for (var i = 0; i < tris.length; i++) {
+				    stl += ("facet normal "+stringifyVector( tris[i].normal )+" \n");
+				    stl += ("outer loop \n");
+				    stl += stringifyVertex( vertices[ tris[i].a ] );
+				    stl += stringifyVertex( vertices[ tris[i].b ] );
+				    stl += stringifyVertex( vertices[ tris[i].c ] );
+				    stl += ("endloop \n");
+				    stl += ("endfacet \n");
+				  }
+				  stl += ("endsolid");
+
+				  console.log(stl);
+				}
 
 
 			});
