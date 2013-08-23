@@ -4,24 +4,58 @@
 		<style>
 			canvas { background-color: #ddd; }
 			body { margin: 0; padding: 0; }
+			#previewWindow {
+				position: absolute;
+				top: 0px;
+				right: 0px;
+				border: 1px solid black;
+			}
+
+			#lathe {
+				position: absolute;
+				top: 25px;
+				right: 500px;
+				font-size: 40px;
+				font-weight: bold;
+			}
 		</style>
 	</head>
 	<body>
+		<div id="canvasContainer"></div>
+		<div id="controls">
+			<button id="lathe">Lathe!! &rarr;</button>
+		</div>
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 		<script src="https://rawgithub.com/mrdoob/three.js/master/build/three.js"></script>
 		<script>
 			var canvasWidth = 800,
 				canvasHeight = 800,
+				previewHeight = 400,
+				previewWidth = 400,
 				magicNumber = 208,
-				pointArray = [];
+				pointArray = [],
+				previewMesh = null;
+
+			// Set up drawing window (d'awww)
 			var scene = new THREE.Scene();
 			var camera = new THREE.PerspectiveCamera(45, canvasWidth / canvasHeight, 1, 1000);
 			camera.position.z = 500;
 
 			var renderer = new THREE.WebGLRenderer();
 			renderer.setSize( canvasWidth, canvasHeight );
-			document.body.appendChild( renderer.domElement );
+			document.getElementById('canvasContainer').appendChild( renderer.domElement ).setAttribute( 'id', 'editWindow' );
 			renderer.render(scene, camera);
+
+			// Set up preview window
+			var previewScene = new THREE.Scene();
+			var previewCamera = new THREE.PerspectiveCamera(45, previewWidth / previewHeight, 1, 1000);
+			previewCamera.position.z = 500;
+			var previewWindow = new THREE.WebGLRenderer();
+			previewWindow.setSize( previewWidth, previewHeight );
+
+			document.getElementById('canvasContainer').appendChild( previewWindow.domElement ).setAttribute( 'id', 'previewWindow' );
+			renderer.render( previewScene, previewCamera );
+
 
 			function addPoint( x, y ) {
 				var sphere = new THREE.Mesh(
@@ -41,7 +75,29 @@
 				// Center Dots
 				//addPoint( 0, 0 );
 
-				$('body').on('click', 'canvas', function(e) {
+				$('#lathe').on('click', function(e) {
+					e.preventDefault();
+					var path = new THREE.Geometry();
+					$.each( pointArray, function(i,p) {
+						path.vertices.push( new THREE.Vector3( p[0], p[1], 0 ) );
+					});
+					console.log( path );
+
+
+					// THREE.LatheGeometry( path.vertices, 20, 0, 2 * Math.PI );
+					if ( previewMesh != null ) {
+						previewScene.remove( previewMesh );
+					}
+
+					previewMesh = new THREE.Mesh( new THREE.LatheGeometry( path.vertices, 12 ), 
+						new THREE.MeshLambertMaterial( { color: 0x2D303D, wireframe: true, shading: THREE.FlatShading } ));
+
+					previewScene.add( previewMesh );
+					previewWindow.render( previewScene, previewCamera);
+
+				});
+
+				$('#editWindow').on('click', function(e) {
 
 					/*
 						http://stackoverflow.com/questions/11586527/converting-world-coordinates-to-screen-coordinates-in-three-js-using-projection
@@ -50,8 +106,8 @@
 
 					*/
 
-					var xPos = ( e.clientX - ( canvasWidth / 2  ) ) * ( magicNumber * 2 / canvasWidth ),
-						yPos = ( ( canvasHeight / 2 ) - e.clientY ) * ( magicNumber * 2 / canvasWidth );
+					var xPos = ( e.pageX - ( canvasWidth / 2  ) ) * ( magicNumber * 2 / canvasWidth ),
+						yPos = ( ( canvasHeight / 2 ) - e.pageY ) * ( magicNumber * 2 / canvasWidth );
 
 					addPoint( xPos, yPos );
 
@@ -77,6 +133,62 @@
 					renderer.render(scene, camera);
 
 				});
+
+
+			    // Mouse Rotation Stuff
+
+			    var mouseDown = false,
+			        mouseDownX = 0,
+			        mouseDownY = 0,
+	                rotateX = 0,
+			        rotateY = 0,
+			        rotationXMouseDown = 0,
+			        rotationYMouseDown = 0;
+
+			    $('#previewWindow').mousedown(function(e) {
+
+			    	console.log('Mooooo');
+			        
+			        if ( e.target.tagName != 'CANVAS' )
+			            return;
+
+			        console.log('COW');
+
+			        if ( previewMesh == null )
+			        	return;
+
+			        console.log('by the horns');
+
+			        mouseDown = true;
+			        mouseDownX = e.pageX;
+			        mouseDownY = e.pageY;
+			        rotationXMouseDown = previewMesh.rotation.x,
+			        rotationYMouseDown = previewMesh.rotation.y;
+			        rotateY = rotateX = 0;
+
+			    }).mouseup(function(e) {
+
+			        mouseDown = false;
+			        console.log('dont scare the cows');
+
+			    }).mousemove(function(e) {
+			        if ( mouseDown ) {
+
+			        	console.log('Moving mouse');
+
+			            rotateY = ( e.pageX - mouseDownX ) * 0.02;
+			            rotateX = ( e.pageY - mouseDownY ) * 0.02;
+
+			            console.log( rotateX, rotateY );
+
+			            previewMesh.rotation.x = rotationXMouseDown - rotateX;
+			            previewMesh.rotation.y = rotationYMouseDown - rotateY;
+
+			            previewWindow.render( previewScene, previewCamera);
+
+			        }
+			    });
+
 
 			});
 
