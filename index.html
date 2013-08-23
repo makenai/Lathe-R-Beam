@@ -11,12 +11,16 @@
 				border: 1px solid black;
 			}
 
-			#lathe {
+			#controls {
 				position: absolute;
 				top: 25px;
 				right: 500px;
-				font-size: 40px;
+			}
+
+			#lathe, #exportstl {	
+				font-size: 30px;
 				font-weight: bold;
+				display: block;
 			}
 		</style>
 	</head>
@@ -24,10 +28,13 @@
 		<div id="canvasContainer"></div>
 		<div id="controls">
 			<button id="lathe">Lathe!! &rarr;</button>
+			<button id="exportstl">Export to STL</button>
 		</div>
+
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 		<script src="https://rawgithub.com/mrdoob/three.js/master/build/three.js"></script>
 		<script src="THREEx.CelShader.js"></script>
+		<script src="FileSaver.js"></script>
 		<script>
 			var canvasWidth = 800,
 				canvasHeight = 800,
@@ -106,7 +113,14 @@
 
 				$('#lathe').on('click', function(e) {
 					e.preventDefault();
+
+					// if someone didn't draw a very good shape with enough points
+					if (pointArray.length < 3) {
+						return
+					}
+
 					var path = new THREE.Geometry();
+
 					$.each( pointArray, function(i,p) {
 						path.vertices.push( new THREE.Vector3( 0, p[0], p[1] ) );
 					});
@@ -133,10 +147,25 @@
 					previewMesh.rotation.x = 300;
 					// previewMesh.rotation.y = 600;
 					previewWindow.render( previewScene, previewCamera);
-					// generateSTL( previewMesh.geometry );
 
 				});
-				//$('#lathe').click();
+
+				$('#exportstl').on('click', function(e) {
+					e.preventDefault();
+
+					$('#lathe').click();
+
+					if (!previewMesh) {
+						return;
+					}
+
+					saveSTL( previewMesh.geometry );
+					
+				});
+
+
+
+				
 
 				$('#editWindow').on('click', function(e) {
 
@@ -248,6 +277,12 @@
 				  stl += ("endsolid");
 
 				  console.log(stl);
+				}
+
+				function saveSTL( geometry ){
+	  				var stlString = generateSTL( geometry );
+				 	var blob = new Blob([stlString], {type: 'text/plain'});
+					saveAs(blob, 'bplug.stl');
 				}
 
 
