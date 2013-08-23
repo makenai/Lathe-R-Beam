@@ -43,6 +43,13 @@
 
 				$('body').on('click', 'canvas', function(e) {
 
+					/*
+						http://stackoverflow.com/questions/11586527/converting-world-coordinates-to-screen-coordinates-in-three-js-using-projection
+
+						http://mrdoob.github.io/three.js/examples/canvas_interactive_cubes.html
+
+					*/
+
 					var xPos = ( e.clientX - ( canvasWidth / 2  ) ) * ( magicNumber * 2 / canvasWidth ),
 						yPos = ( ( canvasHeight / 2 ) - e.clientY ) * ( magicNumber * 2 / canvasWidth );
 
@@ -54,12 +61,11 @@
 
 					var path = new THREE.Geometry();
 
-					path.vertices.push(new THREE.Vector3( pointArray[ pointArray.length - 2 ][0], 
+					path.vertices.push(new THREE.Vector3( pointArray[ pointArray.length - 2 ][0],
 														  pointArray[ pointArray.length - 2 ][1], 0));
 
-					path.vertices.push(new THREE.Vector3( pointArray[ pointArray.length - 1 ][0], 
-														  pointArray[ pointArray.length - 1 ][1], 0));	
-
+					path.vertices.push(new THREE.Vector3( pointArray[ pointArray.length - 1 ][0],
+														  pointArray[ pointArray.length - 1 ][1], 0));
 
 					var lineMaterial = new THREE.LineBasicMaterial();
 					lineMaterial.color = 0x000000;
