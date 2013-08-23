@@ -12,20 +12,11 @@
 		<script>
 			var canvasWidth = 800,
 				canvasHeight = 800,
-				magicNumber = 208;
+				magicNumber = 208,
+				pointArray = [];
 			var scene = new THREE.Scene();
 			var camera = new THREE.PerspectiveCamera(45, canvasWidth / canvasHeight, 1, 1000);
 			camera.position.z = 500;
-			var path = new THREE.Geometry();
-			path.vertices.push(new THREE.Vector3(0, 0, 0));
-			// path.vertices.push(new THREE.Vector3(200, 200, 0));
-			// path.vertices.push(new THREE.Vector3(30, -10, 0));
-			// path.vertices.push(new THREE.Vector3(0, 0, 0));
-			// var line = new THREE.Line(
-			// path);
-			// line.linewidth = 100;
-			// line.color = 0x000000;
-			// scene.add( line );
 
 			var renderer = new THREE.WebGLRenderer();
 			renderer.setSize( canvasWidth, canvasHeight );
@@ -40,10 +31,10 @@
 				sphere.overdraw = true;
 				sphere.position.x = x;
 				sphere.position.y = y;
+				pointArray.push([ x, y ]);
 				scene.add( sphere );
 				renderer.render(scene, camera);
 			}
-
 
 			jQuery(document).ready(function($) {
 
@@ -55,29 +46,28 @@
 					var xPos = ( e.clientX - ( canvasWidth / 2  ) ) * ( magicNumber * 2 / canvasWidth ),
 						yPos = ( ( canvasHeight / 2 ) - e.clientY ) * ( magicNumber * 2 / canvasWidth );
 
-					var lineint = 1;
-					var linestring = "line" + lineint;
-
 					addPoint( xPos, yPos );
 
+					// Don't draw single point lines
+					if ( pointArray.length < 2 )
+						return;
 
-					var path2 = new THREE.Geometry();
-					path2.vertices.push(new THREE.Vector3(0, 0, 0));
-			
-					path2.vertices.push(new THREE.Vector3(xPos, yPos, 0));
-					var line2 = new THREE.Line(path2);
-					line2.linewidth = 100;
-					line2.color = 0x000000;
-					scene.add( line2 );
-					// if (path.vertices.length > 1) {
+					var path = new THREE.Geometry();
 
-					// }
+					path.vertices.push(new THREE.Vector3( pointArray[ pointArray.length - 2 ][0], 
+														  pointArray[ pointArray.length - 2 ][1], 0));
 
+					path.vertices.push(new THREE.Vector3( pointArray[ pointArray.length - 1 ][0], 
+														  pointArray[ pointArray.length - 1 ][1], 0));	
+
+
+					var lineMaterial = new THREE.LineBasicMaterial();
+					lineMaterial.color = 0x000000;
+					lineMaterial.linewidth = 5;
+
+					var line = new THREE.Line( path, lineMaterial );
+					scene.add( line );
 					
-
-
-
-
 					renderer.render(scene, camera);
 
 				});
