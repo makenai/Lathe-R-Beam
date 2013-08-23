@@ -56,6 +56,13 @@
 			var previewWindow = new THREE.WebGLRenderer();
 			previewWindow.setSize( previewWidth, previewHeight );
 
+	        var ambient = new THREE.AmbientLight( 0x050505 );
+	        previewScene.add( ambient );
+
+	        var light = new THREE.PointLight(0xFFFFFF, 1.0);
+	        light.position.y = 50;
+	        previewScene.add(light);
+
 			document.getElementById('canvasContainer').appendChild( previewWindow.domElement ).setAttribute( 'id', 'previewWindow' );
 			previewWindow.render( previewScene, previewCamera );
 
@@ -77,7 +84,7 @@
 
 			function addPoint( x, y ) {
 
-				// console.log("addPoint(" + x + ', ' + y + ');');
+				console.log("addPoint(" + x + ', ' + y + ');');
 
 				var sphere = new THREE.Mesh(
 					new THREE.SphereGeometry(5, 10, 10), 
@@ -103,21 +110,29 @@
 						path.vertices.push( new THREE.Vector3( 0, p[0], p[1] ) );
 					});
 
+					// Snap first point
+					path.vertices[0].y = 0.01;
+
+					// Snap last point
+					path.vertices[ path.vertices.length - 1 ].y = 0.01;
+
+					console.log( path.vertices );
 
 					// THREE.LatheGeometry( path.vertices, 20, 0, 2 * Math.PI );
 					if ( previewMesh != null ) {
 						previewScene.remove( previewMesh );
 					}
 
-					previewMesh = new THREE.Mesh( new THREE.LatheGeometry( path.vertices, 12, 10000000 ), 
-						new THREE.MeshLambertMaterial( { color: 0x2D303D, wireframe: false, shading: THREE.FlatShading } ));
+					previewMesh = new THREE.Mesh( 
+						new THREE.LatheGeometry( path.vertices, 36 ),
+						new THREE.MeshPhongMaterial({ color: 0x3333AA, shininess: 150 })
+					);
 
 					previewScene.add( previewMesh );
 					previewMesh.rotation.x = 300;
-					console.log(previewMesh);
 					// previewMesh.rotation.y = 600;
 					previewWindow.render( previewScene, previewCamera);
-					generateSTL(previewMesh.geometry);
+					// generateSTL( previewMesh.geometry );
 
 				});
 				//$('#lathe').click();
@@ -156,7 +171,6 @@
 					scene.add( line );
 					
 					renderer.render(scene, camera);
-
 
 				});
 
