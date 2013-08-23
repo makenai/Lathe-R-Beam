@@ -44,6 +44,9 @@
 			var renderer = new THREE.WebGLRenderer();
 			renderer.setSize( canvasWidth, canvasHeight );
 			document.getElementById('canvasContainer').appendChild( renderer.domElement ).setAttribute( 'id', 'editWindow' );
+			
+			drawLine( 0, magicNumber, 0, -magicNumber );
+
 			renderer.render(scene, camera);
 
 			// Set up preview window
@@ -54,10 +57,28 @@
 			previewWindow.setSize( previewWidth, previewHeight );
 
 			document.getElementById('canvasContainer').appendChild( previewWindow.domElement ).setAttribute( 'id', 'previewWindow' );
-			renderer.render( previewScene, previewCamera );
+			previewWindow.render( previewScene, previewCamera );
+
+
+			function drawLine( x1, y1, x2, y2 ) {
+				var path = new THREE.Geometry();
+
+				path.vertices.push(new THREE.Vector3( x1, y1, 0));
+				path.vertices.push(new THREE.Vector3( x2, y2, 0));
+
+				var lineMaterial = new THREE.LineBasicMaterial();
+				lineMaterial.color = 0x000000;
+				lineMaterial.linewidth = 1;
+				var line = new THREE.Line( path, lineMaterial );
+				scene.add( line );
+				renderer.render(scene, camera);
+			}
 
 
 			function addPoint( x, y ) {
+
+				// console.log("addPoint(" + x + ', ' + y + ');');
+
 				var sphere = new THREE.Mesh(
 					new THREE.SphereGeometry(5, 10, 10), 
 					new THREE.MeshNormalMaterial()
@@ -79,9 +100,8 @@
 					e.preventDefault();
 					var path = new THREE.Geometry();
 					$.each( pointArray, function(i,p) {
-						path.vertices.push( new THREE.Vector3( p[0], p[1], 0 ) );
+						path.vertices.push( new THREE.Vector3( 0, p[0], p[1] ) );
 					});
-					console.log( path );
 
 
 					// THREE.LatheGeometry( path.vertices, 20, 0, 2 * Math.PI );
@@ -89,13 +109,18 @@
 						previewScene.remove( previewMesh );
 					}
 
-					previewMesh = new THREE.Mesh( new THREE.LatheGeometry( path.vertices, 12 ), 
-						new THREE.MeshLambertMaterial( { color: 0x2D303D, wireframe: true, shading: THREE.FlatShading } ));
+					previewMesh = new THREE.Mesh( new THREE.LatheGeometry( path.vertices, 12, 10000000 ), 
+						new THREE.MeshLambertMaterial( { color: 0x2D303D, wireframe: false, shading: THREE.FlatShading } ));
 
 					previewScene.add( previewMesh );
+					previewMesh.rotation.x = 300;
+					console.log(previewMesh);
+					// previewMesh.rotation.y = 600;
 					previewWindow.render( previewScene, previewCamera);
+					generateSTL(previewMesh.geometry);
 
 				});
+				//$('#lathe').click();
 
 				$('#editWindow').on('click', function(e) {
 
@@ -132,6 +157,7 @@
 					
 					renderer.render(scene, camera);
 
+
 				});
 
 
@@ -147,17 +173,13 @@
 
 			    $('#previewWindow').mousedown(function(e) {
 
-			    	console.log('Mooooo');
 			        
 			        if ( e.target.tagName != 'CANVAS' )
 			            return;
 
-			        console.log('COW');
 
 			        if ( previewMesh == null )
 			        	return;
-
-			        console.log('by the horns');
 
 			        mouseDown = true;
 			        mouseDownX = e.pageX;
@@ -169,17 +191,14 @@
 			    }).mouseup(function(e) {
 
 			        mouseDown = false;
-			        console.log('dont scare the cows');
 
 			    }).mousemove(function(e) {
 			        if ( mouseDown ) {
 
-			        	console.log('Moving mouse');
 
 			            rotateY = ( e.pageX - mouseDownX ) * 0.02;
 			            rotateX = ( e.pageY - mouseDownY ) * 0.02;
 
-			            console.log( rotateX, rotateY );
 
 			            previewMesh.rotation.x = rotationXMouseDown - rotateX;
 			            previewMesh.rotation.y = rotationYMouseDown - rotateY;
@@ -188,6 +207,33 @@
 
 			        }
 			    });
+
+			    function stringifyVector(vec){
+				  return ""+vec.x+" "+vec.y+" "+vec.z;
+				}
+
+				function stringifyVertex(vec){
+				  return "vertex "+stringifyVector(vec)+" \n";
+				}
+
+				function generateSTL(geometry) {
+				  var vertices = geometry.vertices;
+				  var tris     = geometry.faces;
+
+				  stl = "solid pixel";
+				  for (var i = 0; i < tris.length; i++) {
+				    stl += ("facet normal "+stringifyVector( tris[i].normal )+" \n");
+				    stl += ("outer loop \n");
+				    stl += stringifyVertex( vertices[ tris[i].a ] );
+				    stl += stringifyVertex( vertices[ tris[i].b ] );
+				    stl += stringifyVertex( vertices[ tris[i].c ] );
+				    stl += ("endloop \n");
+				    stl += ("endfacet \n");
+				  }
+				  stl += ("endsolid");
+
+				  console.log(stl);
+				}
 
 
 			});
