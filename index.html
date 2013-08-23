@@ -16,11 +16,21 @@
 			var scene = new THREE.Scene();
 			var camera = new THREE.PerspectiveCamera(45, canvasWidth / canvasHeight, 1, 1000);
 			camera.position.z = 500;
+			var path = new THREE.Geometry();
+			path.vertices.push(new THREE.Vector3(0, 0, 0));
+			// path.vertices.push(new THREE.Vector3(200, 200, 0));
+			// path.vertices.push(new THREE.Vector3(30, -10, 0));
+			// path.vertices.push(new THREE.Vector3(0, 0, 0));
+			// var line = new THREE.Line(
+			// path);
+			// line.linewidth = 100;
+			// line.color = 0x000000;
+			// scene.add( line );
 
 			var renderer = new THREE.WebGLRenderer();
 			renderer.setSize( canvasWidth, canvasHeight );
 			document.body.appendChild( renderer.domElement );
-
+			renderer.render(scene, camera);
 
 			function addPoint( x, y ) {
 				var sphere = new THREE.Mesh(
@@ -38,15 +48,32 @@
 			jQuery(document).ready(function($) {
 
 				// Center Dots
-				addPoint( 0, 0 );
+				//addPoint( 0, 0 );
 
 				$('body').on('click', 'canvas', function(e) {
 
 					var xPos = ( e.clientX - ( canvasWidth / 2  ) ) * ( magicNumber * 2 / canvasWidth ),
 						yPos = ( ( canvasHeight / 2 ) - e.clientY ) * ( magicNumber * 2 / canvasWidth );
 
+					var lineint = 1;
+					var linestring = "line" + lineint;
+
 					addPoint( xPos, yPos );
 
+
+					var path2 = new THREE.Geometry();
+					path2.vertices.push(new THREE.Vector3(0, 0, 0));
+			
+					path2.vertices.push(new THREE.Vector3(xPos, yPos, 0));
+					var line2 = new THREE.Line(path2);
+					line2.linewidth = 100;
+					line2.color = 0x000000;
+					scene.add( line2 );
+					// if (path.vertices.length > 1) {
+
+					// }
+
+					
 
 
 
