@@ -60,16 +60,21 @@
 			// Set up preview window
 			var previewScene = new THREE.Scene();
 			var previewCamera = new THREE.PerspectiveCamera(45, previewWidth / previewHeight, 1, 1000);
-			previewCamera.position.z = 500;
+			previewCamera.position.z = 400;
 			var previewWindow = new THREE.WebGLRenderer();
 			previewWindow.setSize( previewWidth, previewHeight );
 
-	        var ambient = new THREE.AmbientLight( 0x050505 );
-	        previewScene.add( ambient );
-
-	        var light = new THREE.PointLight(0xFFFFFF, 1.0);
-	        light.position.y = 50;
+	        var light = new THREE.PointLight( 0xFFAAAA, 0.7 );
+	        light.position.y = 400;
+	        light.position.z = 300;
+	        light.position.x = 100;
 	        previewScene.add(light);
+
+	        var light2 = new THREE.PointLight( 0xAAAAFF, 0.7 );
+	        light2.position.y = -300;
+	        light2.position.z = 300;
+	        light2.position.x = -100;
+	        previewScene.add(light2);
 
 			document.getElementById('canvasContainer').appendChild( previewWindow.domElement ).setAttribute( 'id', 'previewWindow' );
 			previewWindow.render( previewScene, previewCamera );
@@ -137,6 +142,11 @@
 				addPoint(43.68, -85.28);
 				addPoint(0.52, -85.28);
 
+				// Preload our bump map texture
+				var texture = THREE.ImageUtils.loadTexture('texture.png', {}, function() {
+					previewWindow.render( previewScene, previewCamera );
+				});
+
 				$('#lathe').on('click', function(e) {
 					e.preventDefault();
 
@@ -163,17 +173,25 @@
 						previewScene.remove( previewMesh );
 					}
 
+					var material = new THREE.MeshPhongMaterial({ 
+						color: new THREE.Color( 0x0000FF ),
+						shininess: 150,
+						opacity: 0.9,
+						bumpMap: texture,
+						bumpScale: 5
+					});
+
 					previewMesh = new THREE.Mesh( 
-						new THREE.LatheGeometry( path.vertices, 36 ),
-						new THREE.MeshPhongMaterial({ color: 0x3333AA, shininess: 150 })
+						new THREE.LatheGeometry( path.vertices, 36 ), material
 					);
 
 					previewScene.add( previewMesh );
-					previewMesh.rotation.x = 300;
-					// previewMesh.rotation.y = 600;
+					previewMesh.rotation.x = -Math.PI / 2;
 					previewWindow.render( previewScene, previewCamera);
 
 				});
+
+				$('#lathe').click();
 
 				$('#exportstl').on('click', function(e) {
 					e.preventDefault();
