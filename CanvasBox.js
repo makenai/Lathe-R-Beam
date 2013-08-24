@@ -12,8 +12,6 @@ var CanvasBox = function(settings, pointArray) {
 			//previewMesh;
 			self.scene = new THREE.Scene(),
 
-			//pointArray = [];
-
 	this.prototype = {
 
 		setTheScene	: function() {
@@ -122,13 +120,36 @@ var CanvasBox = function(settings, pointArray) {
 		self.scene.add( previewMesh );
 		// rotate it to correct orientation
 		previewMesh.rotation.x = 300;
+
+		// TODO:
+		// this should be in a callback or pub/sub
+		viewport = new Viewport(previewMesh);
+
+		// TODO:
+		// this should be in pub sub also
+		$( "#previewWindow" ).bind({
+  		mousedown: function(e) {
+    		// change to viewport init() function
+    		viewport.init(e);
+    		//console.log(previewMesh);
+  		},
+  		mousemove: function(e) {
+    		// change to viewport rotate() function
+    		viewport.rotateView(e);
+    		self.renderer.render(self.scene, self.camera);
+  		},
+	  	mouseup: function(e) {
+	    	// change to rotate viewport stoprotate() function
+	    	viewport.stopRotateView();
+	  	}
+		});
+
 	},
 
 		renderUpdate : function() {
 			console.log('attempting ' + canvasId + ' render');
 			self.renderer.render(self.scene, self.camera);
 		}
-
 
 	};
 

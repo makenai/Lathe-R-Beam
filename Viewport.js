@@ -1,5 +1,7 @@
-var Viewport = function(portBox) {
+var Viewport = function(previewMesh) {
+
 	var mouseDown = false,
+	self = this,
 	mouseDownX = 0,
 	mouseDownY = 0,
 	rotateX = 0,
@@ -9,7 +11,11 @@ var Viewport = function(portBox) {
 
 	this.prototype = {
 		init : function(e) {
-			if ( previewMesh == null )
+
+			console.log(previewMesh);
+
+			// how do I pass in preview mesh?
+			if (previewMesh == null)
 			  return;
 
         mouseDown = true;
@@ -18,7 +24,8 @@ var Viewport = function(portBox) {
         rotationXMouseDown = previewMesh.rotation.x,
         rotationYMouseDown = previewMesh.rotation.y;
         rotateY = rotateX = 0;
-		}
+		},
+
 		rotateView : function(e) {
 			if (mouseDown) {
         rotateY = ( e.pageX - mouseDownX ) * 0.02;
@@ -27,15 +34,12 @@ var Viewport = function(portBox) {
         previewMesh.rotation.x = rotationXMouseDown - rotateX;
         previewMesh.rotation.y = rotationYMouseDown - rotateY;
 
-        previewWindow.render( previewScene, previewCamera);
-
 			}
 		},
 
 		stopRotateView : function(e) {
 			mouseDown = false;
 		}
-
 	}
 
 	return {

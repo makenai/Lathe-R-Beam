@@ -9,7 +9,8 @@ var ZLathe = function($, t) {
 			pointArray = [],
 			previewMesh = null,
 			editCanvas,
-			previewCanvas;
+			previewCanvas,
+			viewport;
 
 	function init() {
 		console.log('oh hey');
@@ -42,6 +43,8 @@ var ZLathe = function($, t) {
 		editCanvas.renderUpdate();
 		previewCanvas.renderUpdate();
 
+		
+
 		// bind click events
 		bindClickEvents();
 
@@ -52,17 +55,9 @@ var ZLathe = function($, t) {
 	}
 
 	function bindClickEvents() {
-		$( "#previewWindow" ).bind({
-  		mousedown: function(e) {
-    		// change to viewport init() function
-  		},
-  		mousemove: function(e) {
-    		// change to viewport rotate() function
-  		},
-	  	mouseup: function(e) {
-	    	// change to rotate viewport stoprotate() function
-	  	}
-		});
+		//viewport = new Viewport(previewWindow)
+
+		
 
 		$( "#editWindow" ).bind({
 			click: function(e) {
@@ -86,7 +81,7 @@ var ZLathe = function($, t) {
 
 				// make our line
 				editCanvas.drawLine(prev_xPos, prev_yPos, xPos, yPos, 5);
-				//editCanvas.scene.add(line);
+				// render
 				editCanvas.renderUpdate();
 			}
 		});
@@ -98,6 +93,7 @@ var ZLathe = function($, t) {
 				previewCanvas.makeLathe(pointArray);
 				// render!!
 				previewCanvas.renderUpdate();
+				viewport = new Viewport(previewMesh);
 			}
 		});
 
