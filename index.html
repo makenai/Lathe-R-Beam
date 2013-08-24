@@ -53,7 +53,7 @@
 			renderer.setSize( canvasWidth, canvasHeight );
 			document.getElementById('canvasContainer').appendChild( renderer.domElement ).setAttribute( 'id', 'editWindow' );
 			
-			drawLine( 0, magicNumber, 0, -magicNumber );
+			drawLine( 0, magicNumber, 0, -magicNumber, { color: 0x0000FF, dashed: true, thickness: 2 } );
 
 			renderer.render(scene, camera);
 
@@ -75,15 +75,21 @@
 			previewWindow.render( previewScene, previewCamera );
 
 
-			function drawLine( x1, y1, x2, y2 ) {
+			function drawLine( x1, y1, x2, y2, options ) {
+				options = options || {};
+				color = options.color || 0x000000;
+				thickness = options.thickness || 1;
+				dashed = options.dashed || false;
+
 				var path = new THREE.Geometry();
 
 				path.vertices.push(new THREE.Vector3( x1, y1, 0));
 				path.vertices.push(new THREE.Vector3( x2, y2, 0));
+				path.computeLineDistances();
 
-				var lineMaterial = new THREE.LineBasicMaterial();
-				lineMaterial.color = 0x000000;
-				lineMaterial.linewidth = 1;
+				var lineMaterial = dashed ? new THREE.LineDashedMaterial() : new THREE.LineBasicMaterial();
+				lineMaterial.color = new THREE.Color( color );
+				lineMaterial.linewidth = thickness;
 				var line = new THREE.Line( path, lineMaterial );
 				scene.add( line );
 				renderer.render(scene, camera);
@@ -92,7 +98,7 @@
 
 			function addPoint( x, y ) {
 
-				console.log("addPoint(" + x + ', ' + y + ');');
+				// console.log("addPoint(" + x + ', ' + y + ');');
 
 				var sphere = new THREE.Mesh(
 					new THREE.SphereGeometry(5, 10, 10), 
@@ -103,13 +109,33 @@
 				sphere.position.y = y;
 				pointArray.push([ x, y ]);
 				scene.add( sphere );
+
+				// Draw a line connecting the dots
+				if ( pointArray.length > 1 ) {
+					drawLine( 
+						pointArray[ pointArray.length - 2 ][0], pointArray[ pointArray.length - 2 ][1], 
+						pointArray[ pointArray.length - 1 ][0], pointArray[ pointArray.length - 1 ][1],
+						{ thickness: 2 }
+					);
+				}
+
 				renderer.render(scene, camera);
 			}
 
 			jQuery(document).ready(function($) {
 
-				// Center Dots
-				//addPoint( 0, 0 );
+				// Wine Glass
+				addPoint(0, 4.68);
+				addPoint(30.16, 9.36);
+				addPoint(49.4, 34.32);
+				addPoint(40.56, 99.32000000000001);
+				addPoint(47.32, 99.84);
+				addPoint(57.72, 33.28);
+				addPoint(33.28, 1.04);
+				addPoint(5.720000000000001, -9.36);
+				addPoint(4.16, -73.32000000000001);
+				addPoint(43.68, -85.28);
+				addPoint(0.52, -85.28);
 
 				$('#lathe').on('click', function(e) {
 					e.preventDefault();
@@ -131,7 +157,6 @@
 					// Snap last point
 					path.vertices[ path.vertices.length - 1 ].y = 0.01;
 
-					console.log( path.vertices );
 
 					// THREE.LatheGeometry( path.vertices, 20, 0, 2 * Math.PI );
 					if ( previewMesh != null ) {
@@ -180,25 +205,6 @@
 						yPos = ( ( canvasHeight / 2 ) - e.pageY ) * ( magicNumber * 2 / canvasWidth );
 
 					addPoint( xPos, yPos );
-
-					// Don't draw single point lines
-					if ( pointArray.length < 2 )
-						return;
-
-					var path = new THREE.Geometry();
-
-					path.vertices.push(new THREE.Vector3( pointArray[ pointArray.length - 2 ][0],
-														  pointArray[ pointArray.length - 2 ][1], 0));
-
-					path.vertices.push(new THREE.Vector3( pointArray[ pointArray.length - 1 ][0],
-														  pointArray[ pointArray.length - 1 ][1], 0));
-
-					var lineMaterial = new THREE.LineBasicMaterial();
-					lineMaterial.color = 0x000000;
-					lineMaterial.linewidth = 5;
-
-					var line = new THREE.Line( path, lineMaterial );
-					scene.add( line );
 					
 					renderer.render(scene, camera);
 
@@ -216,39 +222,25 @@
 			        rotationYMouseDown = 0;
 
 			    $('#previewWindow').mousedown(function(e) {
-
-			        
 			        if ( e.target.tagName != 'CANVAS' )
 			            return;
-
-
 			        if ( previewMesh == null )
 			        	return;
-
 			        mouseDown = true;
 			        mouseDownX = e.pageX;
 			        mouseDownY = e.pageY;
 			        rotationXMouseDown = previewMesh.rotation.x,
 			        rotationYMouseDown = previewMesh.rotation.y;
 			        rotateY = rotateX = 0;
-
 			    }).mouseup(function(e) {
-
 			        mouseDown = false;
-
 			    }).mousemove(function(e) {
 			        if ( mouseDown ) {
-
-
 			            rotateY = ( e.pageX - mouseDownX ) * 0.02;
 			            rotateX = ( e.pageY - mouseDownY ) * 0.02;
-
-
 			            previewMesh.rotation.x = rotationXMouseDown - rotateX;
 			            previewMesh.rotation.y = rotationYMouseDown - rotateY;
-
 			            previewWindow.render( previewScene, previewCamera);
-
 			        }
 			    });
 
