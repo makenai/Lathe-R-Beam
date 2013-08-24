@@ -24,8 +24,8 @@
 				width: 250px;
 				margin-bottom: 10px;
 				padding: 10px;
-
 			}
+
 		</style>
 	</head>
 	<body>
@@ -41,6 +41,8 @@
 		<script src="THREEx.CelShader.js"></script>
 		<script src="FileSaver.js"></script>
 		<script>
+
+
 			var canvasWidth = 800,
 				canvasHeight = 800,
 				previewHeight = 400,
@@ -51,10 +53,10 @@
 
 			// Set up drawing window (d'awww)
 			var scene = new THREE.Scene();
-			var camera = new THREE.PerspectiveCamera(45, canvasWidth / canvasHeight, 1, 1000);
+			var camera = new THREE.PerspectiveCamera( 45, canvasWidth / canvasHeight, 1, 1000 );
 			camera.position.z = 500;
 
-			var renderer = new THREE.WebGLRenderer();
+			var renderer = new THREE.CanvasRenderer();
 			renderer.setSize( canvasWidth, canvasHeight );
 			document.getElementById('canvasContainer').appendChild( renderer.domElement ).setAttribute( 'id', 'editWindow' );
 			
@@ -64,26 +66,17 @@
 
 			// Set up preview window
 			var previewScene = new THREE.Scene();
-			var previewCamera = new THREE.PerspectiveCamera(45, previewWidth / previewHeight, 1, 1000);
+			var previewCamera = new THREE.PerspectiveCamera( 45, previewWidth / previewHeight, 1, 1000 );
 			previewCamera.position.z = 400;
 			var previewWindow = new THREE.WebGLRenderer();
 			previewWindow.setSize( previewWidth, previewHeight );
 
-	        var light = new THREE.PointLight( 0xFFAAAA, 0.7 );
-	        light.position.y = 20;
-	        light.position.z = 300;
-	        light.position.x = 20;
-	        previewScene.add(light);
-
-	        var light2 = new THREE.PointLight( 0xAAAAFF, 0.7 );
-	        light2.position.y = -30;
-	        light2.position.z = 300;
-	        light2.position.x = -10;
-	        previewScene.add(light2);
+	        var light = new THREE.PointLight( 0xFFFFFF, 1.5 );
+	        light.position.set( 20, 20, 600 );
+	        previewScene.add( light );
 
 			document.getElementById('canvasContainer').appendChild( previewWindow.domElement ).setAttribute( 'id', 'previewWindow' );
 			previewWindow.render( previewScene, previewCamera );
-
 
 			function drawLine( x1, y1, x2, y2, options ) {
 				options = options || {};
@@ -111,8 +104,8 @@
 				// console.log("addPoint(" + x + ', ' + y + ');');
 
 				var sphere = new THREE.Mesh(
-					new THREE.SphereGeometry(5, 10, 10), 
-					new THREE.MeshNormalMaterial()
+					new THREE.SphereGeometry(2.5), 
+					new THREE.MeshBasicMaterial({ color: new THREE.Color(0x5F5F9F) })
 				);
 				sphere.overdraw = true;
 				sphere.position.x = x;
@@ -155,9 +148,15 @@
 				$('#lathe').on('click', function(e) {
 					e.preventDefault();
 
+					// Remove old mesh
+					if ( previewMesh != null ) {
+						previewScene.remove( previewMesh );
+						previewWindow.render( previewScene, previewCamera);
+					}
+
 					// if someone didn't draw a very good shape with enough points
 					if (pointArray.length < 3) {
-						return
+						return;
 					}
 
 					var path = new THREE.Geometry();
@@ -167,27 +166,27 @@
 					});
 
 					// Snap first point
-					path.vertices[0].y = 0.01;
+					if ( path.vertices[0].y < 1.5 )
+						path.vertices[0].y = 0.001;
 
 					// Snap last point
-					path.vertices[ path.vertices.length - 1 ].y = 0.01;
+					if ( path.vertices[ path.vertices.length - 1 ].y < 1.5 )
+						path.vertices[ path.vertices.length - 1 ].y = 0.001;
 
-
-					// THREE.LatheGeometry( path.vertices, 20, 0, 2 * Math.PI );
-					if ( previewMesh != null ) {
-						previewScene.remove( previewMesh );
-					}
+					// Connect back to the first point and make a loop
+					path.vertices.push( path.vertices[0] );
 
 					var material = new THREE.MeshPhongMaterial({ 
-						color: new THREE.Color( 0x0000FF ),
-						shininess: 150,
-						opacity: 10,
+						color: new THREE.Color( 0x2020FF ),
+						shininess: 200,
+						specular: 0x202020,
 						bumpMap: texture,
-						bumpScale: 3
+						bumpScale: 3,
+						side: THREE.DoubleSide
 					});
 
 					previewMesh = new THREE.Mesh( 
-						new THREE.LatheGeometry( path.vertices, 36 ), material
+						new THREE.LatheGeometry( path.vertices, 32 ), material
 					);
 
 					previewScene.add( previewMesh );
@@ -220,26 +219,11 @@
 					renderer.render( scene, camera );
 				});
 
-
-
-				
-
 				$('#editWindow').on('click', function(e) {
-
-					/*
-						http://stackoverflow.com/questions/11586527/converting-world-coordinates-to-screen-coordinates-in-three-js-using-projection
-
-						http://mrdoob.github.io/three.js/examples/canvas_interactive_cubes.html
-
-					*/
-
 					var xPos = ( e.pageX - ( canvasWidth / 2  ) ) * ( magicNumber * 2 / canvasWidth ),
 						yPos = ( ( canvasHeight / 2 ) - e.pageY ) * ( magicNumber * 2 / canvasWidth );
-
 					addPoint( xPos, yPos );
-					
 					renderer.render(scene, camera);
-
 				});
 
 
@@ -299,6 +283,7 @@
 				    stl += ("endfacet \n");
 				  }
 				  stl += ("endsolid");
+				  return stl;
 				}
 
 				function saveSTL( geometry ){
@@ -309,6 +294,11 @@
 
 
 			});
+
+/*
+	http://stackoverflow.com/questions/11586527/converting-world-coordinates-to-screen-coordinates-in-three-js-using-projection
+	http://mrdoob.github.io/three.js/examples/canvas_interactive_cubes.html
+*/
 
 		</script>
 	</body>
