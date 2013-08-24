@@ -90,7 +90,9 @@
 				path.vertices.push(new THREE.Vector3( x2, y2, 0));
 				path.computeLineDistances();
 
-				var lineMaterial = dashed ? new THREE.LineDashedMaterial() : new THREE.LineBasicMaterial();
+				var lineMaterial = dashed ? 
+					new THREE.LineDashedMaterial({ dashSize: 4, gapSize: 5, opacity: 0.25 }) : 
+					new THREE.LineBasicMaterial();
 				lineMaterial.color = new THREE.Color( color );
 				lineMaterial.linewidth = thickness;
 				var line = new THREE.Line( path, lineMaterial );
