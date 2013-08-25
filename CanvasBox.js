@@ -54,7 +54,7 @@ var CanvasBox = function(settings, pointArray) {
 			lineMaterial.linewidth = linewidth;
 
 			var line = new THREE.Line(path, lineMaterial);
-			console.log('drwaing line');
+			console.log('drawing line');
 			self.scene.add(line);		
 		},
 
@@ -92,6 +92,8 @@ var CanvasBox = function(settings, pointArray) {
 		console.log(pointArray);
 		// start creating our new path prepped for lathing
 		var path = new THREE.Geometry();
+
+		// this here is causing duplication of preview meshes
 		var previewMesh;
 
 		// populate new geometry with all the points the user created

@@ -14,7 +14,6 @@ var Viewport = function(previewMesh) {
 
 			console.log(previewMesh);
 
-			// how do I pass in preview mesh?
 			if (previewMesh == null)
 			  return;
 

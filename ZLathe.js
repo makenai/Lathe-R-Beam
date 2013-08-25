@@ -43,8 +43,6 @@ var ZLathe = function($, t) {
 		editCanvas.renderUpdate();
 		previewCanvas.renderUpdate();
 
-		
-
 		// bind click events
 		bindClickEvents();
 
@@ -55,9 +53,6 @@ var ZLathe = function($, t) {
 	}
 
 	function bindClickEvents() {
-		//viewport = new Viewport(previewWindow)
-
-		
 
 		$( "#editWindow" ).bind({
 			click: function(e) {
@@ -93,9 +88,8 @@ var ZLathe = function($, t) {
 				previewCanvas.makeLathe(pointArray);
 				// render!!
 				previewCanvas.renderUpdate();
-				viewport = new Viewport(previewMesh);
 			}
-		});
+		}/*, perhaps a callback here?*/);
 
 	}
 
