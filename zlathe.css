@@ -1,0 +1,80 @@
+body {
+	background: url(images/geometry.png);
+}
+
+#logo {
+	display: block;
+	text-indent: -9999px;
+	width: 420px;
+	height: 140px;
+	background: url(images/zlathe.png);
+	margin: 10px 0;
+}
+
+#canvasContainer {
+	position: relative;
+}
+
+#windows {
+	height: 580px;
+}
+
+#editWindow {
+	border-right: 1px solid white;
+	position: absolute; 
+	left: 0px;
+	-webkit-border-top-left-radius: 5px;
+	-webkit-border-bottom-left-radius: 5px;
+	-moz-border-radius-topleft: 5px;
+	-moz-border-radius-bottomleft: 5px;
+	border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
+}
+
+#previewWindow {
+	border-left: 1px solid white;
+	position: absolute;
+	right: 0px;
+	-webkit-border-top-right-radius: 5px;
+	-webkit-border-bottom-right-radius: 5px;
+	-moz-border-radius-topright: 5px;
+	-moz-border-radius-bottomright: 5px;
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+}
+
+canvas { 
+	background-color: #d8d8d8;
+	width: 570px;
+	height: 570px;
+}
+
+/* Buttons */
+
+#lathe {
+	position: absolute;
+	width: 90px;
+	top: 15px;
+	left: 525px;
+}
+
+#exportstl {
+	position: absolute;
+	width: 150px;
+	top: 510px;
+	right: 210px;
+}
+
+#undo, #clear {
+	position: absolute;
+	width: 90px;
+	top: 510px;
+}
+#undo { left: 188px; }
+#clear { left: 291px; }
+
+/* End Buttons */
+
+div.footer {
+	padding-bottom: 10px;
+}
