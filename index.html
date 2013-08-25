@@ -32,8 +32,9 @@
 		<div id="canvasContainer"></div>
 		<div id="controls">
 			<button id="lathe">Lathe!! &rarr;</button>
-			<button id="clear">Clear</button>
+			<button id="undo">Undo</button>
 			<button id="exportstl">Export to STL</button>
+			<button id="clear">Clear</button>
 		</div>
 
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
@@ -210,6 +211,8 @@
 
 				$('#clear').on('click', function(e) {
 					e.preventDefault();
+					if ( !confirm('Are you sure?') )
+						return;
 					// Clone the array
 					var children = scene.children.slice(0);
 					$.each( children, function( i, child) {
@@ -220,6 +223,19 @@
 					pointArray = [];
 					renderer.render( scene, camera );
 				});
+
+				$('#undo').on('click', function(e) {
+					e.preventDefault();
+					// Clone the array
+					var children = scene.children.slice(0);
+					if ( children.length == 1 )
+						return;
+					scene.remove( children[ children.length - 1 ] );
+					scene.remove( children[ children.length - 2 ] );
+					pointArray.pop();
+					renderer.render( scene, camera );
+				});
+
 
 				$('#editWindow').on('click', function(e) {
 					var xPos = ( e.pageX - ( canvasWidth / 2  ) ) * ( magicNumber * 2 / canvasWidth ),
