@@ -11,7 +11,7 @@ var Viewport = function(previewMesh) {
 
 	this.prototype = {
 		init : function(e) {
-
+			// don't make a viewport if there's no mesh
 			if (previewMesh == null) {
 			  return;
 			}

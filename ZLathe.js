@@ -1,7 +1,6 @@
 var ZLathe = function($, t) {
 
-
-	// dont ask. 
+	// dont ask about the magic number.
 	var magicNumber = 208,
 			pointArray,
 			editCanvas,
@@ -49,7 +48,7 @@ var ZLathe = function($, t) {
 
 		console.log('ZLathe ready!')
 
-		// take this out later, just for testing
+		// take this out later, just for testing/debugging
 		// window.editCanvas = editCanvas;
 		// window.previewCanvas = previewCanvas;
 
@@ -57,7 +56,7 @@ var ZLathe = function($, t) {
 
 	function bindClickEvents() {
 
-		$( "#editWindow" ).bind({
+		$("#editWindow").bind({
 			click: function(e) {
 				// put the add point function here
 				var vec = editCanvas.findSceneLoc(e.pageX, e.pageY),
@@ -67,7 +66,7 @@ var ZLathe = function($, t) {
 				// make a sphere
 				editCanvas.addPoint(xPos, yPos);
 				
-				// Don't draw single point lines
+				// don't draw single point lines
 				if (pointArray.length < 2) {
 						editCanvas.renderUpdate();
 						return;
@@ -77,25 +76,23 @@ var ZLathe = function($, t) {
 				var prev_xPos = pointArray[ pointArray.length - 2 ][0],
 						prev_yPos = pointArray[ pointArray.length - 2 ][1];
 
-				// make our line
+				// make our line and render it
 				editCanvas.drawLine(prev_xPos, prev_yPos, xPos, yPos, 5);
-				// render
 				editCanvas.renderUpdate();
 			}
 		});
 
 		$('#lathe').bind({
 			click: function(e) {
+				// this ain't no hyperlink yo
 				e.preventDefault();
-				// run lathe 
+
+				// run lathe and render
 				previewMesh = previewCanvas.makeLathe(pointArray, previewMesh);
-				// render!!
 				previewCanvas.renderUpdate();
 
-				// kick off a new viewport for ther new mesh
+				// kick off a new viewport for ther new mesh, then bind events for it
 				viewport = new Viewport(previewMesh);
-
-				// bind viewport events
 				previewCanvas.bindViewportEvents(viewport);	
 			}
 		});
@@ -116,5 +113,5 @@ var ZLathe = function($, t) {
 
 }(jQuery, THREE);
 
-// let's kick this shit off
+// let's kick this off
 ZLathe.init();

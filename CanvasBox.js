@@ -9,11 +9,11 @@ var CanvasBox = function(settings, pointArray) {
 			lights = s.lights,
 			// dont ask.
 			magicNumber = 208;
-			//previewMesh;
-			self.scene = new THREE.Scene(),
+			self.scene = new THREE.Scene();
 
 	this.prototype = {
 
+		// create a new scene for use
 		setTheScene	: function() {
 	
 			// create scene 
@@ -47,14 +47,16 @@ var CanvasBox = function(settings, pointArray) {
 			var path = new THREE.Geometry(),
 					lineMaterial = new THREE.LineBasicMaterial();
 
+			put the user created points into the geometry
 			path.vertices.push(new THREE.Vector3( x1, y1, 0));
 			path.vertices.push(new THREE.Vector3( x2, y2, 0));
 
+			// set the line properties
 			lineMaterial.color = 0x000000,
 			lineMaterial.linewidth = linewidth;
 
+			// create the line and add it to the scene
 			var line = new THREE.Line(path, lineMaterial);
-			console.log('drawing line');
 			self.scene.add(line);		
 		},
 
@@ -66,14 +68,18 @@ var CanvasBox = function(settings, pointArray) {
 				new THREE.SphereGeometry(5, 10, 10), 
 				new THREE.MeshNormalMaterial()
 			);
+
+			// set sphere props
 			sphere.overdraw = true;
 			sphere.position.x = x;
 			sphere.position.y = y;
 			pointArray.push([ x, y ]);
 			
+			// add spehere to scene
 			self.scene.add(sphere);
 	},
 
+		// mapping browser coords to canvas 3d space coords
 		findSceneLoc : function(x, y) {
 				var xPos = ( x - ( canvasWidth / 2  ) ) * ( magicNumber * 2 / canvasWidth ),
 						yPos = ( ( canvasHeight / 2 ) - y ) * ( magicNumber * 2 / canvasHeight );
@@ -81,6 +87,7 @@ var CanvasBox = function(settings, pointArray) {
 				return {'xPos': xPos, 'yPos': yPos}
 		},
 
+		// major function to create the lathed object
 		makeLathe: function(pointArray, previewMesh) {
 			// if someone didn't draw a very good shape with enough points
 			if (pointArray.length < 3) {
@@ -89,9 +96,6 @@ var CanvasBox = function(settings, pointArray) {
 
 			// start creating our new path prepped for lathing
 			var path = new THREE.Geometry();
-
-			// this here is causing duplication of preview meshes
-			//var previewMesh;
 
 			// populate new geometry with all the points the user created
 			$.each(pointArray, function(i, p) {
@@ -104,7 +108,6 @@ var CanvasBox = function(settings, pointArray) {
 
 			// if there's already a mesh, remove it ready for a new one
 			if (previewMesh != null) {
-				console.log('removing old preview mesh')
 				self.scene.remove( previewMesh );
 			}
 
@@ -122,32 +125,28 @@ var CanvasBox = function(settings, pointArray) {
 			previewMesh.rotation.x = 300;
 
 			return previewMesh;
-
 		},
 
+		// once a viewport is created, bind the mouse events
 		bindViewportEvents : function(viewport) {
 
 			$( "#previewWindow" ).bind({
 	  		mousedown: function(e) {
-	    		// change to viewport init() function
 	    		viewport.init(e);
-	    		//console.log(previewMesh);
 	  		},
 	  		mousemove: function(e) {
-	    		// change to viewport rotate() function
 	    		viewport.rotateView(e);
 	    		self.renderer.render(self.scene, self.camera);
 	  		},
 		  	mouseup: function(e) {
-		    	// change to rotate viewport stoprotate() function
 		    	viewport.stopRotateView();
 		  	}
 			});
 
 		},
 
+		// very useful and heavily used to update render in the canvas
 		renderUpdate : function() {
-			console.log('attempting ' + canvasId + ' render');
 			self.renderer.render(self.scene, self.camera);
 		}
 
