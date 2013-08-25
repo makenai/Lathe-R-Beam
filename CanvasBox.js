@@ -43,11 +43,11 @@ var CanvasBox = function(settings, pointArray) {
 		},
 
 		// simple function to draw a line between two defined vectors
-		drawLine : function( x1, y1, x2, y2, linewidth ) {
+		drawLine : function(x1, y1, x2, y2, linewidth) {
 			var path = new THREE.Geometry(),
 					lineMaterial = new THREE.LineBasicMaterial();
 
-			put the user created points into the geometry
+			//put the user created points into the geometry
 			path.vertices.push(new THREE.Vector3( x1, y1, 0));
 			path.vertices.push(new THREE.Vector3( x2, y2, 0));
 

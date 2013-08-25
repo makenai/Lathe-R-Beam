@@ -73,8 +73,8 @@ var ZLathe = function($, t) {
 				}
 
 				// find the previous point we made to help join the dots
-				var prev_xPos = pointArray[ pointArray.length - 2 ][0],
-						prev_yPos = pointArray[ pointArray.length - 2 ][1];
+				var prev_xPos = pointArray[pointArray.length - 2][0],
+						prev_yPos = pointArray[pointArray.length - 2][1];
 
 				// make our line and render it
 				editCanvas.drawLine(prev_xPos, prev_yPos, xPos, yPos, 5);
@@ -99,6 +99,7 @@ var ZLathe = function($, t) {
 
 		$('#exportstl').bind({
 			click: function(e) {
+				// this ain't no hyperlink yo
 				e.preventDefault();
 				var file = new Export;
 				file.saveSTL(previewMesh.geometry);

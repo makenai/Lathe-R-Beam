@@ -16,12 +16,12 @@ var Viewport = function(previewMesh) {
 			  return;
 			}
 
-        mouseDown = true;
-        mouseDownX = e.pageX;
-        mouseDownY = e.pageY;
-        rotationXMouseDown = previewMesh.rotation.x,
-        rotationYMouseDown = previewMesh.rotation.y;
-        rotateY = rotateX = 0;
+    mouseDown = true;
+    mouseDownX = e.pageX;
+    mouseDownY = e.pageY;
+    rotationXMouseDown = previewMesh.rotation.x,
+    rotationYMouseDown = previewMesh.rotation.y;
+    rotateY = rotateX = 0;
 		},
 
 		rotateView : function(e) {
