@@ -61,8 +61,6 @@ var CanvasBox = function(settings, pointArray) {
 		// function to add a sphere, then push to an array for drawing lines later
 	 	addPoint : function( x, y ) {
 
-			console.log("addPoint(" + x + ', ' + y + ');');
-
 			// make sphere
 			var sphere = new THREE.Mesh(
 				new THREE.SphereGeometry(5, 10, 10), 
@@ -76,77 +74,77 @@ var CanvasBox = function(settings, pointArray) {
 			self.scene.add(sphere);
 	},
 
-	 findSceneLoc : function(x, y) {
-			var xPos = ( x - ( canvasWidth / 2  ) ) * ( magicNumber * 2 / canvasWidth ),
-					yPos = ( ( canvasHeight / 2 ) - y ) * ( magicNumber * 2 / canvasHeight );
+		findSceneLoc : function(x, y) {
+				var xPos = ( x - ( canvasWidth / 2  ) ) * ( magicNumber * 2 / canvasWidth ),
+						yPos = ( ( canvasHeight / 2 ) - y ) * ( magicNumber * 2 / canvasHeight );
 
-			return {'xPos': xPos, 'yPos': yPos}
-	},
+				return {'xPos': xPos, 'yPos': yPos}
+		},
 
-	 makeLathe: function(pointArray) {
-		// if someone didn't draw a very good shape with enough points
-		if (pointArray.length < 3) {
-			return;
-		}
+		makeLathe: function(pointArray, previewMesh) {
+			// if someone didn't draw a very good shape with enough points
+			if (pointArray.length < 3) {
+				return;
+			}
 
-		console.log(pointArray);
-		// start creating our new path prepped for lathing
-		var path = new THREE.Geometry();
+			// start creating our new path prepped for lathing
+			var path = new THREE.Geometry();
 
-		// this here is causing duplication of preview meshes
-		var previewMesh;
+			// this here is causing duplication of preview meshes
+			//var previewMesh;
 
-		// populate new geometry with all the points the user created
-		$.each(pointArray, function(i, p) {
-			path.vertices.push(new THREE.Vector3(0, p[0], p[1]));
-		});
+			// populate new geometry with all the points the user created
+			$.each(pointArray, function(i, p) {
+				path.vertices.push(new THREE.Vector3(0, p[0], p[1]));
+			});
 
-		// snap first and last points for cleaner lathing
-		path.vertices[0].y = 0.01;
-		path.vertices[path.vertices.length - 1].y = 0.01;
+			// snap first and last points for cleaner lathing
+			path.vertices[0].y = 0.01;
+			path.vertices[path.vertices.length - 1].y = 0.01;
 
-		// if there's already a mesh, remove it ready for a new one
-		if (previewMesh != null) {
-			self.scene.remove( previewMesh );
-		}
+			// if there's already a mesh, remove it ready for a new one
+			if (previewMesh != null) {
+				console.log('removing old preview mesh')
+				self.scene.remove( previewMesh );
+			}
 
-		// wooo new mesh
-		previewMesh = new THREE.Mesh(
-			// let's give it 36 segs for now
-			new THREE.LatheGeometry(path.vertices, 36),
-			// make it shiny
-			new THREE.MeshPhongMaterial({ color: 0x3333AA, shininess: 150 })
-		);
+			// wooo new mesh
+			previewMesh = new THREE.Mesh(
+				// let's give it 36 segs for now
+				new THREE.LatheGeometry(path.vertices, 36),
+				// make it shiny
+				new THREE.MeshPhongMaterial({ color: 0x3333AA, shininess: 150 })
+			);
 
-		// add the mesh to the previewCanvas scene
-		self.scene.add( previewMesh );
-		// rotate it to correct orientation
-		previewMesh.rotation.x = 300;
+			// add the mesh to the previewCanvas scene
+			self.scene.add( previewMesh );
+			// rotate it to correct orientation
+			previewMesh.rotation.x = 300;
 
-		// TODO:
-		// this should be in a callback or pub/sub
-		viewport = new Viewport(previewMesh);
+			return previewMesh;
 
-		// TODO:
-		// this should be in pub sub also
-		$( "#previewWindow" ).bind({
-  		mousedown: function(e) {
-    		// change to viewport init() function
-    		viewport.init(e);
-    		//console.log(previewMesh);
-  		},
-  		mousemove: function(e) {
-    		// change to viewport rotate() function
-    		viewport.rotateView(e);
-    		self.renderer.render(self.scene, self.camera);
-  		},
-	  	mouseup: function(e) {
-	    	// change to rotate viewport stoprotate() function
-	    	viewport.stopRotateView();
-	  	}
-		});
+		},
 
-	},
+		bindViewportEvents : function(viewport) {
+
+			$( "#previewWindow" ).bind({
+	  		mousedown: function(e) {
+	    		// change to viewport init() function
+	    		viewport.init(e);
+	    		//console.log(previewMesh);
+	  		},
+	  		mousemove: function(e) {
+	    		// change to viewport rotate() function
+	    		viewport.rotateView(e);
+	    		self.renderer.render(self.scene, self.camera);
+	  		},
+		  	mouseup: function(e) {
+		    	// change to rotate viewport stoprotate() function
+		    	viewport.stopRotateView();
+		  	}
+			});
+
+		},
 
 		renderUpdate : function() {
 			console.log('attempting ' + canvasId + ' render');
@@ -156,14 +154,15 @@ var CanvasBox = function(settings, pointArray) {
 	};
 
 	return {
-						setTheScene		: this.prototype.setTheScene,
-						renderUpdate  : this.prototype.renderUpdate, 
-						drawLine			: this.prototype.drawLine,
-						addPoint			: this.prototype.addPoint,
-						makeLathe			: this.prototype.makeLathe,
-						findSceneLoc	: this.prototype.findSceneLoc,
-						scene			   : self.scene,
-						canvasWidth  : canvasWidth,
-						canvasHeight : canvasHeight
+						setTheScene				 : this.prototype.setTheScene,
+						renderUpdate  		 : this.prototype.renderUpdate, 
+						drawLine					 : this.prototype.drawLine,
+						addPoint					 : this.prototype.addPoint,
+						makeLathe					 : this.prototype.makeLathe,
+						findSceneLoc			 : this.prototype.findSceneLoc,
+						bindViewportEvents : this.prototype.bindViewportEvents,
+						scene			   		 	 : self.scene,
+						canvasWidth  		 	 : canvasWidth,
+						canvasHeight 		 	 : canvasHeight
 					}
 };

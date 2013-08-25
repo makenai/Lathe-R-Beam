@@ -12,10 +12,9 @@ var Viewport = function(previewMesh) {
 	this.prototype = {
 		init : function(e) {
 
-			console.log(previewMesh);
-
-			if (previewMesh == null)
+			if (previewMesh == null) {
 			  return;
+			}
 
         mouseDown = true;
         mouseDownX = e.pageX;

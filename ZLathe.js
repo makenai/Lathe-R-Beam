@@ -10,10 +10,11 @@ var ZLathe = function($, t) {
 			previewMesh = null,
 			editCanvas,
 			previewCanvas,
-			viewport;
+			viewport,
+			file;
 
 	function init() {
-		console.log('oh hey');
+		console.log('ZLathe initializing...');
 
 		// create edit window canvas
 		editCanvas = new CanvasBox({
@@ -45,6 +46,8 @@ var ZLathe = function($, t) {
 
 		// bind click events
 		bindClickEvents();
+
+		console.log('ZLathe ready!')
 
 		// take this out later, just for testing
 		// window.editCanvas = editCanvas;
@@ -85,11 +88,25 @@ var ZLathe = function($, t) {
 			click: function(e) {
 				e.preventDefault();
 				// run lathe 
-				previewCanvas.makeLathe(pointArray);
+				previewMesh = previewCanvas.makeLathe(pointArray, previewMesh);
 				// render!!
 				previewCanvas.renderUpdate();
+
+				// kick off a new viewport for ther new mesh
+				viewport = new Viewport(previewMesh);
+
+				// bind viewport events
+				previewCanvas.bindViewportEvents(viewport);	
 			}
-		}/*, perhaps a callback here?*/);
+		});
+
+		$('#exportstl').bind({
+			click: function(e) {
+				e.preventDefault();
+				var file = new Export;
+				file.saveSTL(previewMesh.geometry);
+			}
+		});
 
 	}
 
