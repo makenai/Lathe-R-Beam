@@ -1,9 +1,9 @@
 var ZLathe = function($, t) {
 
-	var pointArray,
-			editCanvas,
+	var editCanvas,
 			previewCanvas,
-			pointArray = [],
+			pointArray = [], // Kind of feels like this should live in 
+							 // editCanvas and we should call editCanvas.getPointArray? -Pawel
 			previewMesh = null,
 			editCanvas,
 			previewCanvas,
@@ -22,7 +22,7 @@ var ZLathe = function($, t) {
 			'renderer' : 'Canvas',
 			'lights' : false,
 			'lineHelper' : true
-		}, pointArray);
+		});
 
 		// create preview window canvas
 		previewCanvas = new CanvasBox({
@@ -32,7 +32,7 @@ var ZLathe = function($, t) {
 			'canvasId' : 'previewWindow',
 			'lights' : true,
 			'lineHelper' : false
-		}), pointArray;
+		});
 
 		// populate the scenes with the bare essentials
 		editCanvas.setTheScene();
@@ -69,19 +69,17 @@ var ZLathe = function($, t) {
 
 				// make a sphere
 				editCanvas.addPoint(xPos, yPos);
+				pointArray.push([ xPos, yPos ]);
+
+				// Draw a line connecting the dots
+				if ( pointArray.length > 1 ) {
+					editCanvas.drawLine( 
+						pointArray[ pointArray.length - 2 ][0], pointArray[ pointArray.length - 2 ][1], 
+						pointArray[ pointArray.length - 1 ][0], pointArray[ pointArray.length - 1 ][1],
+						{ thickness: 2 }
+					);
+				}		
 				
-				// don't draw single point lines
-				if (pointArray.length < 2) {
-						editCanvas.renderUpdate();
-						return;
-				}
-
-				// find the previous point we made to help join the dots
-				var prev_xPos = pointArray[pointArray.length - 2][0],
-						prev_yPos = pointArray[pointArray.length - 2][1];
-
-				// make our line and render it
-				editCanvas.drawLine(prev_xPos, prev_yPos, xPos, yPos);
 				editCanvas.renderUpdate();
 			}
 		});
@@ -104,6 +102,31 @@ var ZLathe = function($, t) {
 				}
 			}
 		});
+
+		$('#clear').bind({
+			click: function(e) {
+				// this ain't no hyperlink yo
+				e.preventDefault();
+				if ( !confirm('Are you sure you want to clear everything?') )
+					return;
+				// Empty out the point array
+				pointArray.splice(0,pointArray.length);
+				editCanvas.clearScene();
+				editCanvas.renderUpdate();
+			}
+		});
+
+		$('#undo').bind({
+			click: function(e) {
+				// this ain't no hyperlink yo
+				e.preventDefault();
+				pointArray.pop();			
+				// Remove line. then the point
+				editCanvas.removeLastItem();
+				editCanvas.removeLastItem();
+				editCanvas.renderUpdate();				
+			}
+		});		
 
 		$('#exportstl').bind({
 			click: function(e) {

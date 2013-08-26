@@ -1,5 +1,5 @@
 // function to generate canvas scenes for us to use
-var CanvasBox = function(settings, pointArray) {
+var CanvasBox = function(settings) {
 			var self = this,
 			s = settings,
 			canvasWidth = s.canvasWidth,
@@ -82,12 +82,27 @@ var CanvasBox = function(settings, pointArray) {
 			// set sphere props
 			sphere.overdraw = true;
 			sphere.position.x = x;
-			sphere.position.y = y;
-			pointArray.push([ x, y ]);
+			sphere.position.y = y;	
 			
 			// add spehere to scene
 			self.scene.add(sphere);
-	},
+		},
+
+		clearScene : function() {
+			var children = self.scene.children.slice(0);
+			$.each( children, function( i, child) {
+				// Remove everything but the dotted line
+				if ( i > 0 )
+					self.scene.remove( child );
+			});	
+		},
+
+		removeLastItem : function() {
+			var children = self.scene.children.slice(0);
+			if ( children.length == 1 )
+				return;
+			self.scene.remove( children[ children.length - 1 ] );
+		},
 
 		// mapping browser coords to canvas 3d space coords
 		findSceneLoc : function(x, y) {
@@ -181,8 +196,10 @@ var CanvasBox = function(settings, pointArray) {
 						renderUpdate  		 : this.prototype.renderUpdate, 
 						drawLine					 : this.prototype.drawLine,
 						addPoint					 : this.prototype.addPoint,
+						removeLastItem 				 : this.prototype.removeLastItem,
 						makeLathe					 : this.prototype.makeLathe,
 						findSceneLoc			 : this.prototype.findSceneLoc,
+						clearScene				: this.prototype.clearScene,
 						bindViewportEvents : this.prototype.bindViewportEvents,
 						scene			   		 	 : self.scene,
 						canvasWidth  		 	 : canvasWidth,
