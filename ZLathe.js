@@ -19,6 +19,7 @@ var ZLathe = function($, t) {
 			'canvasHeight' : 570,
 			'canvasContainer' : 'windows',
 			'canvasId' : 'editWindow',
+			'renderer' : 'Canvas',
 			'lights' : false,
 			'lineHelper' : true
 		}, pointArray);
@@ -80,7 +81,7 @@ var ZLathe = function($, t) {
 						prev_yPos = pointArray[pointArray.length - 2][1];
 
 				// make our line and render it
-				editCanvas.drawLine(prev_xPos, prev_yPos, xPos, yPos, 5);
+				editCanvas.drawLine(prev_xPos, prev_yPos, xPos, yPos);
 				editCanvas.renderUpdate();
 			}
 		});

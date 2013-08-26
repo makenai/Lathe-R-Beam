@@ -19,7 +19,12 @@ var CanvasBox = function(settings, pointArray) {
 			// create scene 
 			self.camera = new THREE.PerspectiveCamera(45, canvasWidth / canvasHeight, 1, 1000);
 			self.camera.position.z = 400;
-			self.renderer = new THREE.WebGLRenderer();
+
+			if (s.renderer == 'Canvas') {
+				self.renderer = new THREE.CanvasRenderer();
+			} else {
+				self.renderer = new THREE.WebGLRenderer({ antialias: true });	
+			}
 			self.renderer.setSize(canvasWidth, canvasHeight);
 
 			// put the renderer into the canvas element
@@ -27,33 +32,41 @@ var CanvasBox = function(settings, pointArray) {
 			
 			// draw a line down the middle of the scene for the edit window only
 			if (s.lineHelper) {
-				var line = this.drawLine( 0, magicNumber, 0, -magicNumber, 1 );
+				var line = this.drawLine( 0, magicNumber, 0, -magicNumber, { color: 0x0000FF, dashed: true } );
 				self.scene.add(line);
 			}
 
 			if (lights) {
 				var ambientLight = new THREE.AmbientLight( 0x050505 );
-		    self.scene.add(ambientLight);
+			    self.scene.add(ambientLight);
 
-		    var pointLight = new THREE.PointLight(0xFFFFFF, 1.0);
-		    pointLight.position.y = 50;
-		    self.scene.add(pointLight);
+			    var pointLight = new THREE.PointLight(0xFFFFFF, 1.0);
+			    pointLight.position.y = 50;
+			    self.scene.add(pointLight);
 			}
 
 		},
 
 		// simple function to draw a line between two defined vectors
-		drawLine : function(x1, y1, x2, y2, linewidth) {
+		drawLine : function(x1, y1, x2, y2, options) {
+			options = options || {};
+			color = options.color || 0x000000;
+			thickness = options.thickness || 2;
+			dashed = options.dashed || false;
+
 			var path = new THREE.Geometry(),
-					lineMaterial = new THREE.LineBasicMaterial();
+				lineMaterial = dashed ? 
+					new THREE.LineDashedMaterial({ dashSize: 4, gapSize: 5, opacity: 0.25 }) : 
+					new THREE.LineBasicMaterial();
 
 			//put the user created points into the geometry
 			path.vertices.push(new THREE.Vector3( x1, y1, 0));
 			path.vertices.push(new THREE.Vector3( x2, y2, 0));
+			path.computeLineDistances();
 
 			// set the line properties
-			lineMaterial.color = 0x000000,
-			lineMaterial.linewidth = linewidth;
+			lineMaterial.color = new THREE.Color( color ),
+			lineMaterial.linewidth = thickness;
 
 			// create the line and add it to the scene
 			var line = new THREE.Line(path, lineMaterial);
@@ -65,8 +78,8 @@ var CanvasBox = function(settings, pointArray) {
 
 			// make sphere
 			var sphere = new THREE.Mesh(
-				new THREE.SphereGeometry(5, 10, 10), 
-				new THREE.MeshNormalMaterial()
+				new THREE.SphereGeometry(2.5), 
+				new THREE.MeshBasicMaterial({ color: new THREE.Color(0x5F5F9F) })
 			);
 
 			// set sphere props
@@ -122,7 +135,7 @@ var CanvasBox = function(settings, pointArray) {
 			// add the mesh to the previewCanvas scene
 			self.scene.add( previewMesh );
 			// rotate it to correct orientation
-			previewMesh.rotation.x = 300;
+			previewMesh.rotation.x = -Math.PI / 2;
 
 			return previewMesh;
 		},
