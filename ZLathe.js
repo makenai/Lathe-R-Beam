@@ -1,8 +1,6 @@
 var ZLathe = function($, t) {
 
-	// dont ask about the magic number.
-	var magicNumber = 156,
-			pointArray,
+	var pointArray,
 			editCanvas,
 			previewCanvas,
 			pointArray = [],

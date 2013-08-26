@@ -8,7 +8,7 @@ var CanvasBox = function(settings, pointArray) {
 			canvasId = s.canvasId,
 			lights = s.lights,
 			// dont ask.
-			magicNumber = 208;
+			magicNumber = 165;
 			self.scene = new THREE.Scene();
 
 	this.prototype = {
@@ -18,7 +18,7 @@ var CanvasBox = function(settings, pointArray) {
 	
 			// create scene 
 			self.camera = new THREE.PerspectiveCamera(45, canvasWidth / canvasHeight, 1, 1000);
-			self.camera.position.z = 500;
+			self.camera.position.z = 400;
 			self.renderer = new THREE.WebGLRenderer();
 			self.renderer.setSize(canvasWidth, canvasHeight);
 
