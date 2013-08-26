@@ -15,23 +15,21 @@ var Viewport = function(previewMesh) {
 			if (previewMesh == null) {
 			  return;
 			}
-
-    mouseDown = true;
-    mouseDownX = e.pageX;
-    mouseDownY = e.pageY;
-    rotationXMouseDown = previewMesh.rotation.x,
-    rotationYMouseDown = previewMesh.rotation.y;
-    rotateY = rotateX = 0;
+		    mouseDown = true;
+		    mouseDownX = e.pageX;
+		    mouseDownY = e.pageY;
+		    rotationXMouseDown = previewMesh.rotation.x,
+		    rotationYMouseDown = previewMesh.rotation.y;
+		    rotateY = rotateX = 0;
 		},
 
 		rotateView : function(e) {
 			if (mouseDown) {
-        rotateY = ( e.pageX - mouseDownX ) * 0.02;
-        rotateX = ( e.pageY - mouseDownY ) * 0.02;
+		        rotateY = ( e.pageX - mouseDownX ) * 0.02;
+		        rotateX = ( e.pageY - mouseDownY ) * 0.02;
 
-        previewMesh.rotation.x = rotationXMouseDown - rotateX;
-        previewMesh.rotation.y = rotationYMouseDown - rotateY;
-
+		        previewMesh.rotation.x = rotationXMouseDown - rotateX;
+		        previewMesh.rotation.y = rotationYMouseDown - rotateY;
 			}
 		},
 
@@ -41,9 +39,9 @@ var Viewport = function(previewMesh) {
 	}
 
 	return {
-						init						: this.prototype.init,
-						rotateView			: this.prototype.rotateView,
-						stopRotateView  : this.prototype.stopRotateView
-					}
+		init			: this.prototype.init,
+		rotateView		: this.prototype.rotateView,
+		stopRotateView  : this.prototype.stopRotateView
+	}
 
 };

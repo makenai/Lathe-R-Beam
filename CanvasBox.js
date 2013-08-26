@@ -37,12 +37,9 @@ var CanvasBox = function(settings, pointArray) {
 			}
 
 			if (lights) {
-				var ambientLight = new THREE.AmbientLight( 0x050505 );
-			    self.scene.add(ambientLight);
-
-			    var pointLight = new THREE.PointLight(0xFFFFFF, 1.0);
-			    pointLight.position.y = 50;
-			    self.scene.add(pointLight);
+				var light = new THREE.PointLight( 0xFFFFFF, 1.5 );
+		        light.position.set( 20, 20, 600 );
+		        self.scene.add( light );
 			}
 
 		},
@@ -124,12 +121,26 @@ var CanvasBox = function(settings, pointArray) {
 				self.scene.remove( previewMesh );
 			}
 
+			// Lazily load and cache preview mesh texture
+			if ( !self.texture ) {
+				self.texture = THREE.ImageUtils.loadTexture('images/texture.png', {}, function() {
+					self.prototype.renderUpdate();
+				});
+			}
+
 			// wooo new mesh
 			previewMesh = new THREE.Mesh(
 				// let's give it 36 segs for now
 				new THREE.LatheGeometry(path.vertices, 36),
-				// make it shiny
-				new THREE.MeshPhongMaterial({ color: 0x3333AA, shininess: 150 })
+				// make it shiny, textured and pretty
+				new THREE.MeshPhongMaterial({ 
+						color: new THREE.Color( 0x2020FF ),
+						shininess: 200,
+						specular: 0x202020,
+						bumpMap: self.texture,
+						bumpScale: 3,
+						side: THREE.DoubleSide
+					})
 			);
 
 			// add the mesh to the previewCanvas scene
@@ -149,7 +160,7 @@ var CanvasBox = function(settings, pointArray) {
 	  		},
 	  		mousemove: function(e) {
 	    		viewport.rotateView(e);
-	    		self.renderer.render(self.scene, self.camera);
+	    		self.prototype.renderUpdate();
 	  		},
 		  	mouseup: function(e) {
 		    	viewport.stopRotateView();
