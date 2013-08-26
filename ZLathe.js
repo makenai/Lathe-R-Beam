@@ -55,7 +55,6 @@ var ZLathe = function($, t) {
 
 	// Enable / disable the Lathe and STL buttons
 	function updateButtonStates() {
-		console.log('updating.');
 		// Less than three poitns are not lathe-able
 		if (pointArray.length < 3) {
 			$('#lathe').prop('disabled', true);
