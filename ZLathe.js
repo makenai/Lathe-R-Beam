@@ -96,8 +96,12 @@ var ZLathe = function($, t) {
 				previewCanvas.renderUpdate();
 
 				// kick off a new viewport for ther new mesh, then bind events for it
-				viewport = new Viewport(previewMesh);
-				previewCanvas.bindViewportEvents(viewport);	
+				if ( !viewport ) {
+					viewport = new Viewport(previewMesh);
+					previewCanvas.bindViewportEvents(viewport);
+				} else {
+					viewport.setPreviewMesh( previewMesh );
+				}
 			}
 		});
 

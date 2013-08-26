@@ -1,4 +1,4 @@
-var Viewport = function(previewMesh) {
+var Viewport = function(initialPreviewMesh) {
 
 	var mouseDown = false,
 	self = this,
@@ -7,7 +7,8 @@ var Viewport = function(previewMesh) {
 	rotateX = 0,
 	rotateY = 0,
 	rotationXMouseDown = 0,
-	rotationYMouseDown = 0;
+	rotationYMouseDown = 0,
+	previewMesh = initialPreviewMesh;
 
 	this.prototype = {
 		init : function(e) {
@@ -15,11 +16,10 @@ var Viewport = function(previewMesh) {
 			if (previewMesh == null) {
 			  return;
 			}
+			self.prototype.setPreviewMesh( previewMesh );
 		    mouseDown = true;
 		    mouseDownX = e.pageX;
 		    mouseDownY = e.pageY;
-		    rotationXMouseDown = previewMesh.rotation.x,
-		    rotationYMouseDown = previewMesh.rotation.y;
 		    rotateY = rotateX = 0;
 		},
 
@@ -35,13 +35,20 @@ var Viewport = function(previewMesh) {
 
 		stopRotateView : function(e) {
 			mouseDown = false;
+		},
+
+		setPreviewMesh : function(newPreviewMesh) {
+			previewMesh = newPreviewMesh;
+		    rotationXMouseDown = previewMesh.rotation.x,
+		    rotationYMouseDown = previewMesh.rotation.y;
 		}
 	}
 
 	return {
 		init			: this.prototype.init,
 		rotateView		: this.prototype.rotateView,
-		stopRotateView  : this.prototype.stopRotateView
+		stopRotateView  : this.prototype.stopRotateView,
+		setPreviewMesh  : this.prototype.setPreviewMesh
 	}
 
 };
