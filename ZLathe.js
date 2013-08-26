@@ -53,6 +53,25 @@ var ZLathe = function($, t) {
 
 	}
 
+	// Enable / disable the Lathe and STL buttons
+	function updateButtonStates() {
+		console.log('updating.');
+		// Less than three poitns are not lathe-able
+		if (pointArray.length < 3) {
+			$('#lathe').prop('disabled', true);
+		} else {
+			$('#lathe').prop('disabled', false);
+		}
+
+		// Preview mesh is required for an export
+		if ( previewMesh ) {
+			$('#exportstl').prop('disabled', false);
+		} else {
+			$('#exportstl').prop('disabled', true);
+		}
+
+	}	
+
 	function bindClickEvents() {
 
 		$("#editWindow").bind({
@@ -79,8 +98,9 @@ var ZLathe = function($, t) {
 						{ thickness: 2 }
 					);
 				}		
-				
+
 				editCanvas.renderUpdate();
+				updateButtonStates();
 			}
 		});
 
@@ -100,6 +120,7 @@ var ZLathe = function($, t) {
 				} else {
 					viewport.setPreviewMesh( previewMesh );
 				}
+				updateButtonStates();
 			}
 		});
 
@@ -113,6 +134,7 @@ var ZLathe = function($, t) {
 				pointArray.splice(0,pointArray.length);
 				editCanvas.clearScene();
 				editCanvas.renderUpdate();
+				updateButtonStates();
 			}
 		});
 
@@ -124,7 +146,8 @@ var ZLathe = function($, t) {
 				// Remove line. then the point
 				editCanvas.removeLastItem();
 				editCanvas.removeLastItem();
-				editCanvas.renderUpdate();				
+				editCanvas.renderUpdate();
+				updateButtonStates();
 			}
 		});		
 
