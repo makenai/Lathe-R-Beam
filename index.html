@@ -1,294 +1,39 @@
+<!DOCTYPE html>
 <html>
 	<head>
-		<title>Lathe</title>
-		<style>
-			canvas { background-color: #ddd; }
-			body { margin: 0; padding: 0; }
-			#previewWindow {
-				position: absolute;
-				top: 0px;
-				right: 0px;
-				border: 1px solid black;
-			}
-
-			#controls {
-				position: absolute;
-				top: 25px;
-				right: 500px;
-			}
-
-			#lathe, #exportstl {	
-				font-size: 30px;
-				font-weight: bold;
-				display: block;
-			}
-		</style>
+		<title>ZLathe : Everyone must turn, turn, turn.</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link href="http://netdna.bootstrapcdn.com/bootswatch/3.0.0/flatly/bootstrap.min.css" rel="stylesheet">
+		<link href="http://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+		<link rel="stylesheet" href="zlathe.css">		
 	</head>
 	<body>
-		<div id="canvasContainer"></div>
-		<div id="controls">
-			<button id="lathe">Lathe!! &rarr;</button>
-			<button id="exportstl">Export to STL</button>
+		<div class="container">
+			<div class="header">
+				<h1 id="logo">ZLathe</h1>
+			</div>
+			<div id="canvasContainer">
+				<div id="windows"></div>
+				<button class="btn btn-success" id="lathe" disabled="true"><i class="icon-refresh"></i> Lathe</button>
+				<button class="btn btn-warning" id="undo"><i class="icon-undo"></i> Undo</button>
+				<button class="btn btn-info" id="exportstl" disabled="true"><i class="icon-download-alt"></i> Export to STL</button>
+				<button class="btn btn-danger" id="clear"><i class="icon-trash"></i> Clear</button>
+			</div>			
+			<h3>Instructions</h3>
+			<p>Click three or more times in the left window to create a profile shape. Try to make the first and last points as close to the dotted line as possible. When you're done, click 'Lathe' and see your creation turned into a 3D shape!</p>
+			<p>You can pan and tilt the 3D shape by moving your mouse, or export to STL format for 3D printing. Running through <a href="http://cloud.netfabb.com/">netfabb</a> before attempting to print is highly recommended.</p>
+			<div class="footer">
+				By <a href="http://twitter.com/suziam">@suziam</a> and <a href="http://twitter.com/makenai">@makenai</a> aka (by their powers combined) Amalgamation of Cats.
+				<img src="images/amalgamation.png" alt="An amalgamation of cats.">
+			</div>
 		</div>
-
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
 		<script src="https://rawgithub.com/mrdoob/three.js/master/build/three.js"></script>
-		<script src="THREEx.CelShader.js"></script>
+		<script src="CanvasBox.js"></script>
+		<script src="Viewport.js"></script>
 		<script src="FileSaver.js"></script>
-		<!--<script src="ZLathe.js"></script>-->
-		<script>
-			var canvasWidth = 800,
-				canvasHeight = 800,
-				previewHeight = 400,
-				previewWidth = 400,
-				magicNumber = 208,
-				pointArray = [],
-				previewMesh = null;   
-
-			// Set up drawing window (d'awww)
-			var scene = new THREE.Scene();
-			var camera = new THREE.PerspectiveCamera(45, canvasWidth / canvasHeight, 1, 1000);
-			camera.position.z = 500;
-
-			var renderer = new THREE.WebGLRenderer();
-			renderer.setSize( canvasWidth, canvasHeight );
-			document.getElementById('canvasContainer').appendChild( renderer.domElement ).setAttribute( 'id', 'editWindow' );
-			
-			drawLine( 0, magicNumber, 0, -magicNumber );
-
-			renderer.render(scene, camera);
-
-			// Set up preview window
-			var previewScene = new THREE.Scene();
-			var previewCamera = new THREE.PerspectiveCamera(45, previewWidth / previewHeight, 1, 1000);
-			previewCamera.position.z = 500;
-			var previewWindow = new THREE.WebGLRenderer();
-			previewWindow.setSize( previewWidth, previewHeight );
-
-	        var ambient = new THREE.AmbientLight( 0x050505 );
-	        previewScene.add( ambient );
-
-	        var light = new THREE.PointLight(0xFFFFFF, 1.0);
-	        light.position.y = 50;
-	        previewScene.add(light);
-
-			document.getElementById('canvasContainer').appendChild( previewWindow.domElement ).setAttribute( 'id', 'previewWindow' );
-			previewWindow.render( previewScene, previewCamera );
-
-
-			function drawLine( x1, y1, x2, y2 ) {
-				var path = new THREE.Geometry();
-
-				path.vertices.push(new THREE.Vector3( x1, y1, 0));
-				path.vertices.push(new THREE.Vector3( x2, y2, 0));
-
-				var lineMaterial = new THREE.LineBasicMaterial();
-				lineMaterial.color = 0x000000;
-				lineMaterial.linewidth = 1;
-				var line = new THREE.Line( path, lineMaterial );
-				scene.add( line );
-				renderer.render(scene, camera);
-			}
-
-
-			function addPoint( x, y ) {
-
-				console.log("addPoint(" + x + ', ' + y + ');');
-
-				var sphere = new THREE.Mesh(
-					new THREE.SphereGeometry(5, 10, 10), 
-					new THREE.MeshNormalMaterial()
-				);
-				sphere.overdraw = true;
-				sphere.position.x = x;
-				sphere.position.y = y;
-				pointArray.push([ x, y ]);
-				scene.add( sphere );
-				renderer.render(scene, camera);
-			}
-
-			jQuery(document).ready(function($) {
-
-				// Center Dots
-				//addPoint( 0, 0 );
-
-				$('#lathe').on('click', function(e) {
-					e.preventDefault();
-
-					// if someone didn't draw a very good shape with enough points
-					if (pointArray.length < 3) {
-						return
-					}
-
-					var path = new THREE.Geometry();
-
-					$.each( pointArray, function(i,p) {
-						path.vertices.push( new THREE.Vector3( 0, p[0], p[1] ) );
-					});
-
-					// Snap first point
-					path.vertices[0].y = 0.01;
-
-					// Snap last point
-					path.vertices[ path.vertices.length - 1 ].y = 0.01;
-
-					console.log( path.vertices );
-
-					// THREE.LatheGeometry( path.vertices, 20, 0, 2 * Math.PI );
-					if ( previewMesh != null ) {
-						previewScene.remove( previewMesh );
-					}
-
-					previewMesh = new THREE.Mesh( 
-						new THREE.LatheGeometry( path.vertices, 36 ),
-						new THREE.MeshPhongMaterial({ color: 0x3333AA, shininess: 150 })
-					);
-
-					previewScene.add( previewMesh );
-					previewMesh.rotation.x = 300;
-					// previewMesh.rotation.y = 600;
-					previewWindow.render( previewScene, previewCamera);
-
-				});
-
-				$('#exportstl').on('click', function(e) {
-					e.preventDefault();
-
-					$('#lathe').click();
-
-					if (!previewMesh) {
-						return;
-					}
-
-					saveSTL( previewMesh.geometry );
-					
-				});
-
-
-
-				
-
-				$('#editWindow').on('click', function(e) {
-
-					/*
-						http://stackoverflow.com/questions/11586527/converting-world-coordinates-to-screen-coordinates-in-three-js-using-projection
-
-						http://mrdoob.github.io/three.js/examples/canvas_interactive_cubes.html
-
-					*/
-
-					var xPos = ( e.pageX - ( canvasWidth / 2  ) ) * ( magicNumber * 2 / canvasWidth ),
-						yPos = ( ( canvasHeight / 2 ) - e.pageY ) * ( magicNumber * 2 / canvasWidth );
-
-					addPoint( xPos, yPos );
-
-					// Don't draw single point lines
-					if ( pointArray.length < 2 )
-						return;
-
-					var path = new THREE.Geometry();
-
-					path.vertices.push(new THREE.Vector3( pointArray[ pointArray.length - 2 ][0],
-														  pointArray[ pointArray.length - 2 ][1], 0));
-
-					path.vertices.push(new THREE.Vector3( pointArray[ pointArray.length - 1 ][0],
-														  pointArray[ pointArray.length - 1 ][1], 0));
-
-					var lineMaterial = new THREE.LineBasicMaterial();
-					lineMaterial.color = 0x000000;
-					lineMaterial.linewidth = 5;
-
-					var line = new THREE.Line( path, lineMaterial );
-					scene.add( line );
-					
-					renderer.render(scene, camera);
-
-				});
-
-
-			    // Mouse Rotation Stuff
-
-			    var mouseDown = false,
-			        mouseDownX = 0,
-			        mouseDownY = 0,
-	                rotateX = 0,
-			        rotateY = 0,
-			        rotationXMouseDown = 0,
-			        rotationYMouseDown = 0;
-
-			    $('#previewWindow').mousedown(function(e) {
-
-			        
-			        if ( e.target.tagName != 'CANVAS' )
-			            return;
-
-
-			        if ( previewMesh == null )
-			        	return;
-
-			        mouseDown = true;
-			        mouseDownX = e.pageX;
-			        mouseDownY = e.pageY;
-			        rotationXMouseDown = previewMesh.rotation.x,
-			        rotationYMouseDown = previewMesh.rotation.y;
-			        rotateY = rotateX = 0;
-
-			    }).mouseup(function(e) {
-
-			        mouseDown = false;
-
-			    }).mousemove(function(e) {
-			        if ( mouseDown ) {
-
-
-			            rotateY = ( e.pageX - mouseDownX ) * 0.02;
-			            rotateX = ( e.pageY - mouseDownY ) * 0.02;
-
-
-			            previewMesh.rotation.x = rotationXMouseDown - rotateX;
-			            previewMesh.rotation.y = rotationYMouseDown - rotateY;
-
-			            previewWindow.render( previewScene, previewCamera);
-
-			        }
-			    });
-
-			    function stringifyVector(vec){
-				  return ""+vec.x+" "+vec.y+" "+vec.z;
-				}
-
-				function stringifyVertex(vec){
-				  return "vertex "+stringifyVector(vec)+" \n";
-				}
-
-				function generateSTL(geometry) {
-				  var vertices = geometry.vertices;
-				  var tris     = geometry.faces;
-
-				  stl = "solid pixel";
-				  for (var i = 0; i < tris.length; i++) {
-				    stl += ("facet normal "+stringifyVector( tris[i].normal )+" \n");
-				    stl += ("outer loop \n");
-				    stl += stringifyVertex( vertices[ tris[i].a ] );
-				    stl += stringifyVertex( vertices[ tris[i].b ] );
-				    stl += stringifyVertex( vertices[ tris[i].c ] );
-				    stl += ("endloop \n");
-				    stl += ("endfacet \n");
-				  }
-				  stl += ("endsolid");
-
-				  console.log(stl);
-				}
-
-				function saveSTL( geometry ){
-	  				var stlString = generateSTL( geometry );
-				 	var blob = new Blob([stlString], {type: 'text/plain'});
-					saveAs(blob, 'bplug.stl');
-				}
-
-
-			});
-
-		</script>
+		<script src="Export.js"></script>
+		<script src="ZLathe.js"></script>
 	</body>
 </html>
