@@ -1,7 +1,7 @@
 var ZLathe = function($, t) {
 
 	// dont ask about the magic number.
-	var magicNumber = 208,
+	var magicNumber = 156,
 			pointArray,
 			editCanvas,
 			previewCanvas,
@@ -17,9 +17,9 @@ var ZLathe = function($, t) {
 
 		// create edit window canvas
 		editCanvas = new CanvasBox({
-			'canvasWidth'  : 800,
-			'canvasHeight' : 800,
-			'canvasContainer' : 'canvasContainer',
+			'canvasWidth'  : 570,
+			'canvasHeight' : 570,
+			'canvasContainer' : 'windows',
 			'canvasId' : 'editWindow',
 			'lights' : false,
 			'lineHelper' : true
@@ -27,9 +27,9 @@ var ZLathe = function($, t) {
 
 		// create preview window canvas
 		previewCanvas = new CanvasBox({
-			'canvasWidth'  : 400,
-			'canvasHeight' : 400,
-			'canvasContainer' : 'canvasContainer',
+			'canvasWidth'  : 570,
+			'canvasHeight' : 570,
+			'canvasContainer' : 'windows',
 			'canvasId' : 'previewWindow',
 			'lights' : true,
 			'lineHelper' : false
@@ -58,8 +58,13 @@ var ZLathe = function($, t) {
 
 		$("#editWindow").bind({
 			click: function(e) {
+
+				// Firefox support for relative X / Y positions
+				var offsetX = e.offsetX || e.clientX - $(e.target).offset().left,
+					offsetY = e.offsetY || e.clientY - $(e.target).offset().top;
+
 				// put the add point function here
-				var vec = editCanvas.findSceneLoc(e.pageX, e.pageY),
+				var vec = editCanvas.findSceneLoc(offsetX, offsetY),
 						xPos = vec.xPos,
 						yPos = vec.yPos;
 
