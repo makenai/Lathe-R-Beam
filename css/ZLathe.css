@@ -1,5 +1,5 @@
 body {
-	background: url(images/geometry.png);
+	background: url(../images/geometry.png);
 }
 
 #logo {
@@ -7,7 +7,7 @@ body {
 	text-indent: -9999px;
 	width: 420px;
 	height: 140px;
-	background: url(images/zlathe.png);
+	background: url(../images/zlathe.png);
 	margin: 10px 0;
 }
 
