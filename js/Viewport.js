@@ -39,14 +39,14 @@ var Viewport = function(initialPreviewMesh) {
 
     setPreviewMesh : function(newPreviewMesh) {
       previewMesh = newPreviewMesh;
-        rotationXMouseDown = previewMesh.rotation.x,
-        rotationYMouseDown = previewMesh.rotation.y;
+      rotationXMouseDown = previewMesh.rotation.x,
+      rotationYMouseDown = previewMesh.rotation.y;
     }
   }
 
   return {
-    init      : this.prototype.init,
-    rotateView    : this.prototype.rotateView,
+    init            : this.prototype.init,
+    rotateView      : this.prototype.rotateView,
     stopRotateView  : this.prototype.stopRotateView,
     setPreviewMesh  : this.prototype.setPreviewMesh
   }

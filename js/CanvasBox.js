@@ -6,9 +6,8 @@ var CanvasBox = function(settings) {
       canvasHeight = s.canvasHeight,
       canvasContainer = document.getElementById(s.canvasContainer),
       canvasId = s.canvasId,
-      lights = s.lights,
-      // dont ask.
-      magicNumber = 165;
+      projector = new THREE.Projector();
+
       self.scene = new THREE.Scene();
 
   this.prototype = {
@@ -30,13 +29,17 @@ var CanvasBox = function(settings) {
       // put the renderer into the canvas element
       canvasContainer.appendChild( self.renderer.domElement ).setAttribute( 'id', canvasId );
       
+      // need to call this before calling findSceneLoc (why?)
+      self.prototype.renderUpdate();
+
       // draw a line down the middle of the scene for the edit window only
       if (s.lineHelper) {
-        var line = this.drawLine( 0, magicNumber, 0, -magicNumber, { color: 0x0000FF, dashed: true } );
+        var radius = self.prototype.findSceneLoc( canvasWidth / 2, 0 );
+        var line = this.drawLine( 0, radius.yPos, 0, -radius.yPos, { color: 0x0000FF, dashed: true } );
         self.scene.add(line);
       }
 
-      if (lights) {
+      if (s.lights) {
         var light = new THREE.PointLight( 0xFFFFFF, 1.5 );
             light.position.set( 20, 20, 600 );
             self.scene.add( light );
@@ -82,7 +85,8 @@ var CanvasBox = function(settings) {
       // set sphere props
       sphere.overdraw = true;
       sphere.position.x = x;
-      sphere.position.y = y;  
+      sphere.position.y = y;
+      sphere.position.z = 0;
       
       // add spehere to scene
       self.scene.add(sphere);
@@ -105,11 +109,21 @@ var CanvasBox = function(settings) {
     },
 
     // mapping browser coords to canvas 3d space coords
+    // Susan, please tell me if these comments make any sense and if I am understanding what is happening. :3 -Pawel
     findSceneLoc : function(x, y) {
-        var xPos = ( x - ( canvasWidth / 2  ) ) * ( magicNumber * 2 / canvasWidth ),
-            yPos = ( ( canvasHeight / 2 ) - y ) * ( magicNumber * 2 / canvasHeight );
-
-        return {'xPos': xPos, 'yPos': yPos}
+        // Calculate the x,y on the near plane of the camera between -1 and 1
+        var vector = new THREE.Vector3( ( x / canvasWidth ) * 2 - 1,  -( y / canvasHeight ) * 2 + 1, 0.5 );
+        // Translate from the 2D coordinate to the 3D world
+        projector.unprojectVector( vector, self.camera );
+            // Zoom our point away from our camera to the right point on the Z scale mostly (0)
+        var direction = vector.sub( self.camera.position ).normalize(),
+            // Cast a ray from in the camera in direction of the click
+            ray = new THREE.Ray( self.camera.position, direction ),
+            // Calculate the scale of the distance
+            distance_ratio = -self.camera.position.z / direction.z,
+            // Get final position on Z plane by multiplying by our correct distance ratio
+            pos = self.camera.position.clone().add( direction.multiplyScalar( distance_ratio ) );
+        return {'xPos': pos.x, 'yPos': pos.y }
     },
 
     // major function to create the lathed object
@@ -196,10 +210,10 @@ var CanvasBox = function(settings) {
             renderUpdate       : this.prototype.renderUpdate, 
             drawLine           : this.prototype.drawLine,
             addPoint           : this.prototype.addPoint,
-            removeLastItem         : this.prototype.removeLastItem,
+            removeLastItem     : this.prototype.removeLastItem,
             makeLathe          : this.prototype.makeLathe,
             findSceneLoc       : this.prototype.findSceneLoc,
-            clearScene        : this.prototype.clearScene,
+            clearScene         : this.prototype.clearScene,
             bindViewportEvents : this.prototype.bindViewportEvents,
             scene              : self.scene,
             canvasWidth        : canvasWidth,
