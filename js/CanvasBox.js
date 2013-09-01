@@ -111,7 +111,7 @@ var CanvasBox = function(settings) {
     // mapping browser coords to canvas 3d space coords
     // Susan, please tell me if these comments make any sense and if I am understanding what is happening. :3 -Pawel
     findSceneLoc : function(x, y) {
-        // Calculate the x,y on the near plane of the camera between -1 and 1
+        // Calculate the x,y on the near plane of the camera between -1 and 0
         var vector = new THREE.Vector3( ( x / canvasWidth ) * 2 - 1,  -( y / canvasHeight ) * 2 + 1, 0.5 );
         // Translate from the 2D coordinate to the 3D world
         projector.unprojectVector( vector, self.camera );
