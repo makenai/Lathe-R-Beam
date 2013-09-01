@@ -1,4 +1,4 @@
-var ZLathe = function($, t) {
+var LatheRBeam = function($, t) {
 
   var editCanvas,
       previewCanvas,
@@ -11,7 +11,7 @@ var ZLathe = function($, t) {
       file;
 
   function init() {
-    console.log('ZLathe initializing...');
+    console.log('Lathe-R-Beam initializing...');
 
     // create edit window canvas
     editCanvas = new CanvasBox({
@@ -45,7 +45,7 @@ var ZLathe = function($, t) {
     // bind click events
     bindClickEvents();
 
-    console.log('ZLathe ready!')
+    console.log('Lathe-R-Beam ready!')
 
   };
 
@@ -164,4 +164,4 @@ var ZLathe = function($, t) {
 }(jQuery, THREE);
 
 // let's kick this off
-ZLathe.init();
+LatheRBeam.init();
