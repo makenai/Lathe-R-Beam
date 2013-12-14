@@ -10,10 +10,8 @@ var CanvasBox = function(settings) {
 
       self.scene = new THREE.Scene();
 
-  this.prototype = {
-
     // create a new scene for use
-    setTheScene : function() {
+    function setTheScene() {
   
       // create scene 
       self.camera = new THREE.PerspectiveCamera(45, canvasWidth / canvasHeight, 1, 1000);
@@ -30,11 +28,11 @@ var CanvasBox = function(settings) {
       canvasContainer.appendChild( self.renderer.domElement ).setAttribute( 'id', canvasId );
       
       // need to call this before calling findSceneLoc (why?)
-      self.prototype.renderUpdate();
+      renderUpdate();
 
       // draw a line down the middle of the scene for the edit window only
       if (s.lineHelper) {
-        var radius = self.prototype.findSceneLoc( canvasWidth / 2, 0 );
+        var radius = findSceneLoc( canvasWidth / 2, 0 );
         var line = this.drawLine( 0, radius.yPos, 0, -radius.yPos, { color: 0x0000FF, dashed: true } );
         self.scene.add(line);
       }
@@ -45,10 +43,10 @@ var CanvasBox = function(settings) {
             self.scene.add( light );
       }
 
-    },
+    }
 
     // simple function to draw a line between two defined vectors
-    drawLine : function(x1, y1, x2, y2, options) {
+    function drawLine(x1, y1, x2, y2, options) {
       options = options || {};
       color = options.color || 0x000000;
       thickness = options.thickness || 2;
@@ -71,10 +69,10 @@ var CanvasBox = function(settings) {
       // create the line and add it to the scene
       var line = new THREE.Line(path, lineMaterial);
       self.scene.add(line);   
-    },
+    }
 
     // function to add a sphere, then push to an array for drawing lines later
-    addPoint : function( x, y ) {
+    function addPoint(x, y) {
 
       // make sphere
       var sphere = new THREE.Mesh(
@@ -90,27 +88,27 @@ var CanvasBox = function(settings) {
       
       // add spehere to scene
       self.scene.add(sphere);
-    },
+    }
 
-    clearScene : function() {
+    function clearScene() {
       var children = self.scene.children.slice(0);
       $.each( children, function( i, child) {
         // Remove everything but the dotted line
         if ( i > 0 )
           self.scene.remove( child );
       }); 
-    },
+    }
 
-    removeLastItem : function() {
+    function removeLastItem() {
       var children = self.scene.children.slice(0);
       if ( children.length == 1 )
         return;
       self.scene.remove( children[ children.length - 1 ] );
-    },
+    }
 
     // mapping browser coords to canvas 3d space coords
     // Susan, please tell me if these comments make any sense and if I am understanding what is happening. :3 -Pawel
-    findSceneLoc : function(x, y) {
+    function findSceneLoc(x, y) {
         // Calculate the x,y on the near plane of the camera between -1 and 0
         var vector = new THREE.Vector3( ( x / canvasWidth ) * 2 - 1,  -( y / canvasHeight ) * 2 + 1, 0.5 );
         // Translate from the 2D coordinate to the 3D world
@@ -124,10 +122,10 @@ var CanvasBox = function(settings) {
             // Get final position on Z plane by multiplying by our correct distance ratio
             pos = self.camera.position.clone().add( direction.multiplyScalar( distance_ratio ) );
         return {'xPos': pos.x, 'yPos': pos.y }
-    },
+    }
 
     // major function to create the lathed object
-    makeLathe: function(pointArray, previewMesh) {
+    function makeLathe(pointArray, previewMesh) {
       // if someone didn't draw a very good shape with enough points
       if (pointArray.length < 3) {
         return;
@@ -153,7 +151,7 @@ var CanvasBox = function(settings) {
       // Lazily load and cache preview mesh texture
       if ( !self.texture ) {
         self.texture = THREE.ImageUtils.loadTexture('images/texture.png', {}, function() {
-          self.prototype.renderUpdate();
+          renderUpdate();
         });
       }
 
@@ -178,10 +176,10 @@ var CanvasBox = function(settings) {
       previewMesh.rotation.x = -Math.PI / 2;
 
       return previewMesh;
-    },
+    }
 
     // once a viewport is created, bind the mouse events
-    bindViewportEvents : function(viewport) {
+    function bindViewportEvents(viewport) {
 
       $( "#previewWindow" ).bind({
         mousedown: function(e) {
@@ -189,32 +187,30 @@ var CanvasBox = function(settings) {
         },
         mousemove: function(e) {
           viewport.rotateView(e);
-          self.prototype.renderUpdate();
+          renderUpdate();
         },
         mouseup: function(e) {
           viewport.stopRotateView();
         }
       });
 
-    },
+    }
 
     // very useful and heavily used to update render in the canvas
-    renderUpdate : function() {
+   function renderUpdate() {
       self.renderer.render(self.scene, self.camera);
     }
 
-  };
-
   return {
-            setTheScene        : this.prototype.setTheScene,
-            renderUpdate       : this.prototype.renderUpdate, 
-            drawLine           : this.prototype.drawLine,
-            addPoint           : this.prototype.addPoint,
-            removeLastItem     : this.prototype.removeLastItem,
-            makeLathe          : this.prototype.makeLathe,
-            findSceneLoc       : this.prototype.findSceneLoc,
-            clearScene         : this.prototype.clearScene,
-            bindViewportEvents : this.prototype.bindViewportEvents,
+            setTheScene        : setTheScene,
+            renderUpdate       : renderUpdate, 
+            drawLine           : drawLine,
+            addPoint           : addPoint,
+            removeLastItem     : removeLastItem,
+            makeLathe          : makeLathe,
+            findSceneLoc       : findSceneLoc,
+            clearScene         : clearScene,
+            bindViewportEvents : bindViewportEvents,
             scene              : self.scene,
             canvasWidth        : canvasWidth,
             canvasHeight       : canvasHeight
