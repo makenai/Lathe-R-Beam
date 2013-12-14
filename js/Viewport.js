@@ -1,53 +1,52 @@
 var Viewport = function(initialPreviewMesh) {
+  
+  // update what the preview mesh should be before manipulating
+  this.setPreviewMesh(initialPreviewMesh);
 
-  var mouseDown = false,
-  self = this,
-  mouseDownX = 0,
-  mouseDownY = 0,
-  rotateX = 0,
-  rotateY = 0,
-  rotationXMouseDown = 0,
-  rotationYMouseDown = 0,
-  previewMesh = initialPreviewMesh;
+}
 
-  function init(e) {
+Viewport.prototype = {
+
+  mouseDown          : false,
+  mouseDownX         : 0,
+  mouseDownY         : 0,
+  rotateX            : 0,
+  rotateY            : 0,
+  rotationXMouseDown : 0,
+  rotationYMouseDown : 0,
+
+
+  startRotateView : function(e) {
     // don't make a viewport if there's no mesh
-    if (previewMesh == null) {
+    if (!this.previewMesh) {
       return;
     }
-    setPreviewMesh(previewMesh);
 
-    mouseDown = true;
-    mouseDownX = e.pageX;
-    mouseDownY = e.pageY;
-    rotateY = rotateX = 0;
-  }
+    this.rotationXMouseDown = this.previewMesh.rotation.x;
+    this.rotationYMouseDown = this.previewMesh.rotation.y;
 
-  function rotateView(e) {
-    if (mouseDown) {
-      rotateY = ( e.pageX - mouseDownX ) * 0.02;
-      rotateX = ( e.pageY - mouseDownY ) * 0.02;
+    this.mouseDown = true;
+    this.mouseDownX = e.pageX;
+    this.mouseDownY = e.pageY;
+    this.rotateY = this.rotateX = 0;
+  },
 
-      previewMesh.rotation.x = rotationXMouseDown - rotateX;
-      previewMesh.rotation.y = rotationYMouseDown - rotateY;
+  rotateView : function(e) {
+    if (this.mouseDown) {
+      this.rotateY = ( e.pageX - this.mouseDownX ) * 0.02;
+      this.rotateX = ( e.pageY - this.mouseDownY ) * 0.02;
+
+      this.previewMesh.rotation.x = this.rotationXMouseDown - this.rotateX;
+      this.previewMesh.rotation.y = this.rotationYMouseDown - this.rotateY;
     }
-  }
+  },
 
-  function stopRotateView(e) {
-    mouseDown = false;
-  }
+  stopRotateView : function(e) {
+    this.mouseDown = false;
+  },
 
-  function setPreviewMesh(newPreviewMesh) {
-    previewMesh = newPreviewMesh;
-    rotationXMouseDown = previewMesh.rotation.x,
-    rotationYMouseDown = previewMesh.rotation.y;
-  }
-
-  return {
-    init            : init,
-    rotateView      : rotateView,
-    stopRotateView  : stopRotateView,
-    setPreviewMesh  : setPreviewMesh
+  setPreviewMesh : function(newPreviewMesh) {
+    this.previewMesh = newPreviewMesh;
   }
 
 };
