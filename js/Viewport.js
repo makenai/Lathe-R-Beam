@@ -1,4 +1,5 @@
 var Viewport = function(initialPreviewMesh) {
+  
   // update what the preview mesh should be before manipulating
   this.setPreviewMesh(initialPreviewMesh);
 

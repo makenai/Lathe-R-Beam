@@ -2,8 +2,7 @@ var LatheRBeam = function($, t) {
 
   var editCanvas,
       previewCanvas,
-      pointArray = [], // Kind of feels like this should live in 
-               // editCanvas and we should call editCanvas.getPointArray? -Pawel
+      pointArray = [], // Kind of feels like this should live in editCanvas and we should call editCanvas.getPointArray? -Pawel
       previewMesh = null,
       editCanvas,
       previewCanvas,
@@ -15,23 +14,24 @@ var LatheRBeam = function($, t) {
 
     // create edit window canvas
     editCanvas = new CanvasBox({
-      'canvasWidth'  : 570,
-      'canvasHeight' : 570,
-      'canvasContainer' : 'windows',
-      'canvasId' : 'editWindow',
-      'renderer' : 'Canvas',
-      'lights' : false,
-      'lineHelper' : true
+      canvasWidth  : 570,
+      canvasHeight : 570,
+      canvasContainer : 'windows',
+      canvasId : 'editWindow',
+      renderer : 'Canvas',
+      lights : false,
+      lineHelper : true
     });
 
     // create preview window canvas
     previewCanvas = new CanvasBox({
-      'canvasWidth'  : 570,
-      'canvasHeight' : 570,
-      'canvasContainer' : 'windows',
-      'canvasId' : 'previewWindow',
-      'lights' : true,
-      'lineHelper' : false
+      canvasWidth  : 570,
+      canvasHeight : 570,
+      canvasContainer : 'windows',
+      canvasId : 'previewWindow',
+      renderer : 'Normal',
+      lights : true,
+      lineHelper : false
     });
 
     // populate the scenes with the bare essentials
@@ -111,7 +111,7 @@ var LatheRBeam = function($, t) {
         // kick off a new viewport for ther new mesh, then bind events for it
         if (!viewport) {
           viewport = new Viewport(previewMesh);
-          previewCanvas.bindViewportEvents(viewport);
+          previewCanvas.bindViewportEvents(viewport, previewCanvas);
         } else {
           viewport.setPreviewMesh(previewMesh);
         }

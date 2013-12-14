@@ -1,9 +1,10 @@
 var Export = function() {}
 
 Export.prototype = {
+  
   // convert vectors to usable strings
   stringifyVector : function(vec) {
-      return "" + vec.x + " " + vec.y + " " + vec.z;
+    return "" + vec.x + " " + vec.y + " " + vec.z;
   },
 
   // convert vertexes to usable strings
