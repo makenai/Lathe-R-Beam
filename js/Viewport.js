@@ -10,45 +10,44 @@ var Viewport = function(initialPreviewMesh) {
   rotationYMouseDown = 0,
   previewMesh = initialPreviewMesh;
 
-  this.prototype = {
-    init : function(e) {
-      // don't make a viewport if there's no mesh
-      if (previewMesh == null) {
-        return;
-      }
-      self.prototype.setPreviewMesh( previewMesh );
-        mouseDown = true;
-        mouseDownX = e.pageX;
-        mouseDownY = e.pageY;
-        rotateY = rotateX = 0;
-    },
+  function init(e) {
+    // don't make a viewport if there's no mesh
+    if (previewMesh == null) {
+      return;
+    }
+    setPreviewMesh(previewMesh);
 
-    rotateView : function(e) {
-      if (mouseDown) {
-            rotateY = ( e.pageX - mouseDownX ) * 0.02;
-            rotateX = ( e.pageY - mouseDownY ) * 0.02;
+    mouseDown = true;
+    mouseDownX = e.pageX;
+    mouseDownY = e.pageY;
+    rotateY = rotateX = 0;
+  }
 
-            previewMesh.rotation.x = rotationXMouseDown - rotateX;
-            previewMesh.rotation.y = rotationYMouseDown - rotateY;
-      }
-    },
+  function rotateView(e) {
+    if (mouseDown) {
+      rotateY = ( e.pageX - mouseDownX ) * 0.02;
+      rotateX = ( e.pageY - mouseDownY ) * 0.02;
 
-    stopRotateView : function(e) {
-      mouseDown = false;
-    },
-
-    setPreviewMesh : function(newPreviewMesh) {
-      previewMesh = newPreviewMesh;
-      rotationXMouseDown = previewMesh.rotation.x,
-      rotationYMouseDown = previewMesh.rotation.y;
+      previewMesh.rotation.x = rotationXMouseDown - rotateX;
+      previewMesh.rotation.y = rotationYMouseDown - rotateY;
     }
   }
 
+  function stopRotateView(e) {
+    mouseDown = false;
+  }
+
+  function setPreviewMesh(newPreviewMesh) {
+    previewMesh = newPreviewMesh;
+    rotationXMouseDown = previewMesh.rotation.x,
+    rotationYMouseDown = previewMesh.rotation.y;
+  }
+
   return {
-    init            : this.prototype.init,
-    rotateView      : this.prototype.rotateView,
-    stopRotateView  : this.prototype.stopRotateView,
-    setPreviewMesh  : this.prototype.setPreviewMesh
+    init            : init,
+    rotateView      : rotateView,
+    stopRotateView  : stopRotateView,
+    setPreviewMesh  : setPreviewMesh
   }
 
 };
