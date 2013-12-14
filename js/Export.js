@@ -1,40 +1,39 @@
-var Export = function() {
+var Export = function() {}
 
+Export.prototype = {
   // convert vectors to usable strings
-  function stringifyVector(vec) {
+  stringifyVector : function(vec) {
       return "" + vec.x + " " + vec.y + " " + vec.z;
-  }
+  },
 
   // convert vertexes to usable strings
-  function stringifyVertex(vec) {
-    return "vertex " + stringifyVector(vec) + " \n";
-  }
+  stringifyVertex : function(vec) {
+    return "vertex " + this.stringifyVector(vec) + " \n";
+  },
 
   // basically writes a giant string repping an ASCII STL file
-  function generateSTL(geometry) {
+  generateSTL : function(geometry) {
     var vertices = geometry.vertices,
         tris     = geometry.faces;
 
     stl = "solid pixel";
     for (var i = 0; i < tris.length; i++) {
-      stl += ("facet normal " + stringifyVector(tris[i].normal) + " \n");
+      stl += ("facet normal " + this.stringifyVector(tris[i].normal) + " \n");
       stl += ("outer loop \n");
-      stl += stringifyVertex(vertices[tris[i].a]);
-      stl += stringifyVertex(vertices[tris[i].b]);
-      stl += stringifyVertex(vertices[tris[i].c]);
+      stl += this.stringifyVertex(vertices[tris[i].a]);
+      stl += this.stringifyVertex(vertices[tris[i].b]);
+      stl += this.stringifyVertex(vertices[tris[i].c]);
       stl += ("endloop \n");
       stl += ("endfacet \n");
     }
     stl += ("endsolid");
 
     return stl;
-  };
+  },
 
-  function saveSTL(geometry) {
-    var stlString = generateSTL(geometry);
+  saveSTL : function(geometry) {
+    var stlString = this.generateSTL(geometry);
     var blob = new Blob([stlString], {type: 'text/plain'});
     saveAs(blob, 'yayLathe.stl');
   }
-
-  return {saveSTL : saveSTL}
-}
+};

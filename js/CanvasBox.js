@@ -183,7 +183,7 @@ var CanvasBox = function(settings) {
 
       $( "#previewWindow" ).bind({
         mousedown: function(e) {
-          viewport.init(e);
+          viewport.startRotateView(e);
         },
         mousemove: function(e) {
           viewport.rotateView(e);

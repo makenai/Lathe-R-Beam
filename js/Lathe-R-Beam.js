@@ -109,11 +109,11 @@ var LatheRBeam = function($, t) {
         previewCanvas.renderUpdate();
 
         // kick off a new viewport for ther new mesh, then bind events for it
-        if ( !viewport ) {
+        if (!viewport) {
           viewport = new Viewport(previewMesh);
           previewCanvas.bindViewportEvents(viewport);
         } else {
-          viewport.setPreviewMesh( previewMesh );
+          viewport.setPreviewMesh(previewMesh);
         }
         updateButtonStates();
       }
