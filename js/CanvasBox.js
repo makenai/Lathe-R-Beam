@@ -95,11 +95,12 @@ CanvasBox.prototype = {
   },
 
   clearScene : function() {
+    var _this = this;
     var children = this.scene.children.slice(0);
     $.each(children, function(i, child) {
       // Remove everything but the dotted line
       if ( i > 0 )
-        this.scene.remove(child);
+        _this.scene.remove(child);
     }); 
   },
 
